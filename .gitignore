@@ -1,0 +1,12 @@
+dist
+build
+__pycache__
+*.pyc
+.coverage
+*.egg-info
+
+.project
+.pydevproject
+.settings
+
+src/hcl/parsetab.dat

@@ -1,0 +1,50 @@
+#
+# These tests are taken from decoder_test.go
+#
+
+from __future__ import print_function
+
+from os.path import join, dirname
+import hcl
+import json
+
+import pytest
+
+# hcl, json,
+FIXTURE_DIR = join(dirname(__file__), 'fixtures')
+FIXTURES = [
+    ('basic.hcl', 'basic.json', None),
+    ('basic_squish.hcl', None, {'foo': 'bar', 'bar': '${file("bing/bong.txt")}', 'foo-bar':"baz"}),
+    ('decode_policy.hcl', 'decode_policy.json', None),
+    ('decode_tf_variable.hcl', 'decode_tf_variable.json', None),
+    ('empty.hcl', None, {'resource': {'foo': {}}}),
+    ('flat.hcl', None, {'foo': 'bar', 'Key': 7}),
+    ('multiline_bad.hcl', 'multiline.json', None),
+    ('scientific.hcl', 'scientific.json', None),
+    ('structure.hcl', 'structure_flat.json', None),
+    #('structure2.hcl', 'structure2.json'),  # not in the golang tests
+    #('structure_flatmap.hcl', 'structure_flat.json'),
+    #('structure_list.hcl', 'structure_list.json'), # these don't match in golang either
+    #('structure_list.hcl', None, {'foo': [{'key': 7}, {'key': 12}]}), # nor this
+    #'structure_list_deep.json'
+    ('structure_multi.hcl', 'structure_multi.json', None),
+    ('terraform_heroku.hcl', 'terraform_heroku.json', None)
+]
+
+
+
+
+@pytest.mark.parametrize("hcl_fname,json_fname,struct", FIXTURES)
+def test_decoder(hcl_fname, json_fname, struct):
+    
+    with open(join(FIXTURE_DIR, hcl_fname), 'r') as fp:
+        hcl_json = hcl.load(fp)
+        
+    if json_fname is not None:
+        with open(join(FIXTURE_DIR, json_fname), 'r') as fp:
+            good_json = json.load(fp)
+        
+        assert hcl_json == good_json
+    
+    if struct is not None:
+        assert hcl_json == struct
