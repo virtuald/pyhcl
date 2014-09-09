@@ -1,9 +1,9 @@
 pyhcl 
 =====
 
-Implements a parser of the HashiCorp Configuration Language in Python. This
-implementation aims to be compatible with the original golang version of the
-parser.
+Implements a parser for [HCL (HashiCorp Configuration Language)](https://github.com/hashicorp/hcl) 
+in Python. This implementation aims to be compatible with the original
+golang version of the parser.
 
 The grammar and many of the tests/fixtures were copied/ported from the golang
 parser into pyhcl. 
@@ -73,3 +73,5 @@ Authors
 =======
 
 Dustin Spicuzza (dustin@virtualroadside.com)
+
+Note: This project is not associated with Hashicorp
