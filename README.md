@@ -1,6 +1,8 @@
 pyhcl 
 =====
 
+[![Build Status](https://travis-ci.org/virtuald/pyhcl.svg)](https://travis-ci.org/virtuald/pyhcl)
+
 Implements a parser for [HCL (HashiCorp Configuration Language)](https://github.com/hashicorp/hcl) 
 in Python. This implementation aims to be compatible with the original
 golang version of the parser.
