@@ -8,9 +8,6 @@ python:
 install:
   - "pip install ."
   - "pip install -r testing-requirements.txt"
-  - "pip install python-coveralls"
 # command to run tests
 script:
   - tests/run_tests.sh
-after_success:
-  - coveralls --base_dir tests

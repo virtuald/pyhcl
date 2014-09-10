@@ -10,6 +10,4 @@ __pycache__
 .pydevproject
 .settings
 
-src/hcl/version.py
-
 src/hcl/parsetab.dat
