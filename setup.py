@@ -31,13 +31,17 @@ def get_version():
     d = {}
     with open(join(setup_dir, 'src', 'hcl', 'version.py')) as fp:
         exec(compile(fp.read(), 'version.py', 'exec'), {}, d)
-    return d['__version__'] 
+    return d['__version__']
+
+with open(join(dirname(__file__), 'README.md'), 'r') as readme_file:
+    long_description = readme_file.read()
 
 install_requires=open(join(setup_dir, 'requirements.txt')).readlines()
 
 setup(name='pyhcl',
       version=get_version(),
       description='HCL configuration parser for python',
+      long_description=long_description,
       author='Dustin Spicuzza',
       author_email='dustin@virtualroadside.com',
       package_dir={'': 'src'},
