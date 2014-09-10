@@ -3,9 +3,5 @@ include testing-requirements.txt
 include README.md
 include LICENSE
 
-include tests/*.py
-include tests/fixtures/*.hcl
-include tests/fixtures/*.json
-include tests/lex-fixtures/*.hcl
-include tests/lex-fixtures/*.json
+recursive-include tests *.py *.hcl *.json *.sh
 
