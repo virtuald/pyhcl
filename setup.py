@@ -33,7 +33,7 @@ def get_version():
         exec(compile(fp.read(), 'version.py', 'exec'), {}, d)
     return d['__version__']
 
-with open(join(dirname(__file__), 'README.md'), 'r') as readme_file:
+with open(join(dirname(__file__), 'README.rst'), 'r') as readme_file:
     long_description = readme_file.read()
 
 install_requires=open(join(setup_dir, 'requirements.txt')).readlines()
