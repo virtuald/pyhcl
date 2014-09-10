@@ -4,9 +4,12 @@ __pycache__
 *.pyc
 .coverage
 *.egg-info
+*.egg
 
 .project
 .pydevproject
 .settings
+
+src/hcl/version.py
 
 src/hcl/parsetab.dat
