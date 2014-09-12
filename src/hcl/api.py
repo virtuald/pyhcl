@@ -6,6 +6,14 @@ import sys
 
 
 def isHcl(s):
+    '''
+        Detects whether a string is JSON or HCL
+        
+        :param s: String that may contain HCL or JSON
+        
+        :returns: True if HCL, False if JSON, raises ValueError
+                  if neither
+    '''
     for c in s:
         if c.isspace():
             continue
@@ -19,13 +27,20 @@ def isHcl(s):
 
 
 def load(fp):
+    '''
+        Deserializes a file-pointer like object into a python dictionary.
+        The contents of the file must either be JSON or HCL.
+        
+        :param fp: An object that has a read() function
+    '''
     return loads(fp.read())
 
 def loads(s):
     '''
-        Creates a dictionary out of an HCL-formatted string or a JSON string
+        Deserializes a string and converts it to a dictionary. The contents
+        of the string must either be JSON or HCL.
         
-        TODO: Multiple threads
+        :returns: Dictionary 
     '''
     s = s.decode('utf-8')
     if isHcl(s):
