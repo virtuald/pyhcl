@@ -51,7 +51,21 @@ PARSE_FIXTURES = [
 ]
 
 @pytest.mark.parametrize("hcl_fname,invalid", PARSE_FIXTURES)
-def test_parser(hcl_fname, invalid):
+def test_parser_bytes(hcl_fname, invalid):
+    
+    with open(join(PARSE_FIXTURE_DIR, hcl_fname), 'rb') as fp:
+        
+        input = fp.read()
+        print(input)
+        
+        if not invalid:
+            hcl.loads(input)
+        else:
+            with pytest.raises(ValueError):
+                hcl.loads(input)
+                
+@pytest.mark.parametrize("hcl_fname,invalid", PARSE_FIXTURES)
+def test_parser_str(hcl_fname, invalid):
     
     with open(join(PARSE_FIXTURE_DIR, hcl_fname), 'r') as fp:
         
