@@ -9,6 +9,9 @@ import hcl.lexer
 
 import pytest
 
+class Error:
+    pass
+
 LEX_FIXTURE_DIR = join(dirname(__file__), 'lex-fixtures')
 LEX_FIXTURES = [
     (
@@ -29,6 +32,12 @@ LEX_FIXTURES = [
             "IDENTIFIER", "EQUAL", "LEFTBRACKET",
             "NUMBER", "COMMA", "NUMBER", "COMMA", "STRING",
             "RIGHTBRACKET", None,
+        ],
+    ),
+    (
+        "old.hcl",
+        [
+            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", Error
         ],
     ),
     (
@@ -62,7 +71,12 @@ def test_lexer(hcl_fname, tokens):
     lexer.input(input)
 
     for tok in tokens:
-        lex_tok = lexer.token()
+        try:
+            lex_tok = lexer.token()
+        except ValueError:
+            assert tok is Error
+            return
+            
         if lex_tok is None:
             assert tok is None
         else:
