@@ -27,9 +27,8 @@ def loads(s):
         
         TODO: Multiple threads
     '''
+    s = s.decode('utf-8')
     if isHcl(s):
-        if sys.version_info[0] < 3 and isinstance(s, unicode):
-            s = unicode(s, 'utf-8')
         return HclParser().parse(s)
     else:
         return json.loads(s)
