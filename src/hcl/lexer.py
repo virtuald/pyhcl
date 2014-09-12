@@ -145,10 +145,10 @@ class Lexer(object):
          
         value = self.input[startPos:self.pos+1]
         
-        if value == "true":
+        if value in ["true", "on", "yes"]:
             return LexToken(self, "BOOL", True)
         
-        elif value == "false":
+        elif value in ["false", "off", "no"]:
             return LexToken(self, "BOOL", False)
         
         return LexToken(self, "IDENTIFIER", value)
