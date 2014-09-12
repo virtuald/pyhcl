@@ -4,6 +4,16 @@ from .parser import HclParser
 
 import sys
 
+if sys.version_info[0] < 3:
+    def u(s):
+        return unicode(s, 'utf-8')
+else:
+    def u(s):
+        if isinstance(s, bytes):
+            return s.decode('utf-8')
+        else:
+            return s
+    
 
 def isHcl(s):
     '''
@@ -32,6 +42,8 @@ def load(fp):
         The contents of the file must either be JSON or HCL.
         
         :param fp: An object that has a read() function
+        
+        :returns: Dictionary
     '''
     return loads(fp.read())
 
@@ -42,7 +54,7 @@ def loads(s):
         
         :returns: Dictionary 
     '''
-    s = s.decode('utf-8')
+    s = u(s)
     if isHcl(s):
         return HclParser().parse(s)
     else:
