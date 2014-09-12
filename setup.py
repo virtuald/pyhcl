@@ -49,6 +49,14 @@ setup(name='pyhcl',
       scripts=["scripts/hcltool"],
       setup_requires=['ply'],
       install_requires=install_requires,
-      cmdclass={'install': install})
+      cmdclass={'install': install},
+      classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: Text Processing"
+      ])
 
 
