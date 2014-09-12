@@ -1,3 +1,7 @@
 
 from .api import dumps, load, loads
-from .version import __version__
+
+try:
+    from .version import __version__
+except ImportError:
+    __version__ = 'master'
