@@ -9,7 +9,8 @@ implementation aims to be compatible with the original golang version of
 the parser.
 
 The grammar and many of the tests/fixtures were copied/ported from the
-golang parser into pyhcl.
+golang parser into pyhcl. All releases are tested with Python 2.7, 3.2, 3.3,
+and 3.4. 
 
 Installation
 ============
@@ -32,6 +33,25 @@ use the json module in python, and load/loads/dumps are implemented.
         obj = hcl.load(fp)
 
 Currently the dumps function outputs JSON, and not HCL.
+
+Convert HCL to JSON
+-------------------
+
+pyhcl comes with a script that you can use to easily convert HCL to JSON,
+similar to the json.tool that comes with python::
+
+	hcltool INFILE [OUTFILE]
+	
+Structure Validation
+--------------------
+
+Similar to JSON, the output of parsing HCL is a python dictionary with
+no defined structure. The golang library for HCL implements support for
+parsing HCL according to defined objects, but this implementation does
+not currently support such constructs.
+
+Instead, I recommend that you use tools designed to validate JSON, such
+as the `schematics <https://pypi.python.org/pypi/schematics>` library. 
 
 Syntax
 ======
