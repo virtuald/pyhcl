@@ -1,7 +1,8 @@
-0.1.4 (2014-10-15)
+0.1.5 (2014-10-15)
 ------------------
 * Support escaped strings
 * Support trailing commas
+* Remove support for alternative boolean values
 
 0.1.3 (2014-09-12)
 ------------------
