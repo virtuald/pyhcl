@@ -26,7 +26,7 @@ class HclParser(object):
     tokens = (
         'BOOL',
         'NUMBER',
-        'COMMA', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
+        'COMMA', 'COMMAEND', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
         'LEFTBRACE', 'RIGHTBRACE', 'LEFTBRACKET', 'RIGHTBRACKET', 'PERIOD',
         'EPLUS', 'EMINUS'
     )
@@ -143,7 +143,11 @@ class HclParser(object):
         "listitems : listitems COMMA listitem"
         #self.print_p(p)
         p[0] = p[1] + [p[3]]
-        
+    
+    def p_listitems_2(self, p):
+        "listitems : listitems COMMAEND"
+        #self.print_p(p)
+        p[0] = p[1]
         
     def p_listitem(self, p):
         '''

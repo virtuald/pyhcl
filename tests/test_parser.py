@@ -21,6 +21,10 @@ PARSE_FIXTURES = [
         False,
     ),
     (
+        "list_comma.hcl",
+        False,
+    ),
+    (
         "multiple.hcl",
         False,
     ),

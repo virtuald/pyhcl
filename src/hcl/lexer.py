@@ -66,7 +66,7 @@ class Lexer(object):
             elif c == "-":
                 return LexToken(self, "MINUS")
             elif c == ",":
-                return LexToken(self, "COMMA")
+                return self.lexComma()
             elif c == "=":
                 return LexToken(self, "EQUAL")
             elif c == "[":
@@ -126,7 +126,23 @@ class Lexer(object):
             # If we're done with the comment, return!
             if nested == 0:
                 return True
-            
+    
+    def lexComma(self):
+
+        while True:
+            c = self.peek()
+
+            if c.isspace():
+                self.next()
+                continue
+
+            if c == "]":
+                return LexToken(self, "COMMAEND")
+
+            break
+
+        return LexToken(self, "COMMA")
+
     def lexId(self):
         
         startPos = self.pos+1
