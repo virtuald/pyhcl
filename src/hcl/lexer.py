@@ -223,7 +223,7 @@ class Lexer(object):
         
     def lexString(self):
         
-        startPos = self.pos+1
+        b = []
         braces = 0
         
         while True:
@@ -237,18 +237,30 @@ class Lexer(object):
             # If we hit a newline, then its an error
             if c == '\n':
                 return self.createErr("Newline before string closed")
+
+            # If we're escaping a quote, then escape the quote
+            if c == '\\':
+                n = self.next()
+                if n == '"':
+                    c = n
+                elif n == 'n':
+                    c = '\n'
+                else:
+                    self.backup()
                 
             if braces == 0 and c == "$" and self.peek() == "{":
                 braces = 1
-                c = self.next()    
+                b.append(c)
+                c = self.next()   
             elif braces > 0 and c == "{":
                 braces += 1
                 
             if braces > 0 and c == "}":
                 braces -= 1
-                
-        value = self.input[startPos:self.pos]
-        return LexToken(self, "STRING", value)
+
+            b.append(c)
+        
+        return LexToken(self, "STRING", ''.join(b))
     
     def next(self):
         

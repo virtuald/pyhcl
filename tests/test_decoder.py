@@ -10,7 +10,7 @@ import json
 
 import pytest
 
-# hcl, json,
+# hcl, json, dict
 FIXTURE_DIR = join(dirname(__file__), 'fixtures')
 FIXTURES = [
     ('basic.hcl', 'basic.json', None),
@@ -18,6 +18,7 @@ FIXTURES = [
     ('decode_policy.hcl', 'decode_policy.json', None),
     ('decode_tf_variable.hcl', 'decode_tf_variable.json', None),
     ('empty.hcl', None, {'resource': {'foo': {}}}),
+    ('escape.hcl', None, {'foo': 'bar"baz'}),
     ('flat.hcl', None, {'foo': 'bar', 'Key': 7}),
     ('multiline_bad.hcl', 'multiline.json', None),
     ('scientific.hcl', 'scientific.json', None),
@@ -39,7 +40,9 @@ def test_decoder(hcl_fname, json_fname, struct):
     
     with open(join(FIXTURE_DIR, hcl_fname), 'r') as fp:
         hcl_json = hcl.load(fp)
-        
+    
+    assert json_fname is not None or struct is not None
+
     if json_fname is not None:
         with open(join(FIXTURE_DIR, json_fname), 'r') as fp:
             good_json = json.load(fp)
