@@ -51,7 +51,7 @@ parsing HCL according to defined objects, but this implementation does
 not currently support such constructs.
 
 Instead, I recommend that you use tools designed to validate JSON, such
-as the `schematics <https://pypi.python.org/pypi/schematics>` library. 
+as the `schematics <https://pypi.python.org/pypi/schematics>`_ library. 
 
 Syntax
 ======
