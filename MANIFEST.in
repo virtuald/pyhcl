@@ -2,6 +2,7 @@ include requirements.txt
 include testing-requirements.txt
 include README.rst
 include LICENSE
+include CHANGELOG.md
 
 recursive-include tests *.py *.hcl *.json *.sh
 
