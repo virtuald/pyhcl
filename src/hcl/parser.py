@@ -1,5 +1,5 @@
 
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, exists, join
 import sys
 
 from .lexer import Lexer
@@ -7,7 +7,18 @@ from ply import lex, yacc
 
 import inspect
 
-pickle_file = abspath(join(dirname(__file__), 'parsetab.dat'))
+# When using something like pyinstaller, the __file__ attribute isn't actually
+# set correctly, so the parse file isn't able to be saved anywhere sensible.
+# In these cases, just use a temporary directory, it doesn't take too long to
+# generate the tables anyways... 
+
+if exists(dirname(__file__)):
+    pickle_file = abspath(join(dirname(__file__), 'parsetab.dat'))
+else:
+    import tempfile
+    fobj = tempfile.NamedTemporaryFile()
+    pickle_file = fobj.name
+
 
 if sys.version_info[0] < 3:
     def iteritems(d):
