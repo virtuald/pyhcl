@@ -45,6 +45,8 @@ LEX_FIXTURES = [
         [
             "IDENTIFIER", "LEFTBRACE",
             "IDENTIFIER", "EQUAL", "NUMBER",
+            "STRING", "EQUAL", "NUMBER",
+            "STRING", "EQUAL", "NUMBER",
             "RIGHTBRACE", None,
         ],
     ),

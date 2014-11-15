@@ -97,14 +97,21 @@ class HclParser(object):
         #self.print_p(p)
         p[0] = {}
     
+    def p_objectkey_0(self, p):
+        '''
+        objectkey : IDENTIFIER
+                  | STRING
+        '''
+        #self.print_p(p)
+        p[0] = p[1]
     
     def p_objectitem_0(self, p):
         '''
-        objectitem : IDENTIFIER EQUAL number
-                   | IDENTIFIER EQUAL BOOL
-                   | IDENTIFIER EQUAL STRING
-                   | IDENTIFIER EQUAL object
-                   | IDENTIFIER EQUAL list
+        objectitem : objectkey EQUAL number
+                   | objectkey EQUAL BOOL
+                   | objectkey EQUAL STRING
+                   | objectkey EQUAL object
+                   | objectkey EQUAL list
         '''
         #self.print_p(p)
         p[0] = (p[1], p[3])
