@@ -261,6 +261,8 @@ class Lexer(object):
                     c = n
                 elif n == 'n':
                     c = '\n'
+                elif n == '\\':
+                    c = n
                 else:
                     self.backup()
                 

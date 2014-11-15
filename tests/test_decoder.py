@@ -18,7 +18,7 @@ FIXTURES = [
     ('decode_policy.hcl', 'decode_policy.json', None),
     ('decode_tf_variable.hcl', 'decode_tf_variable.json', None),
     ('empty.hcl', None, {'resource': {'foo': {}}}),
-    ('escape.hcl', None, {'foo': 'bar"baz'}),
+    ('escape.hcl', None, {'foo': 'bar"baz\\n'}),
     ('flat.hcl', None, {'foo': 'bar', 'Key': 7}),
     ('multiline_bad.hcl', 'multiline.json', None),
     ('scientific.hcl', 'scientific.json', None),
