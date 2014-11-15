@@ -1,4 +1,4 @@
-0.1.7 (2014-11-14)
+0.1.8 (2014-11-14)
 ------------------
 * Parse floats properly
 * Properly decode \\n
