@@ -1,3 +1,9 @@
+0.1.7 (2014-11-14)
+------------------
+* Parse floats properly
+* Properly decode \\n
+* Complex keys can be set using strings
+
 0.1.6 (2014-10-23)
 ------------------
 * Fix bug that prevented pyhcl from working in a pyinstaller environment
