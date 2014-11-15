@@ -36,6 +36,7 @@ class HclParser(object):
     
     tokens = (
         'BOOL',
+        'FLOAT',
         'NUMBER',
         'COMMA', 'COMMAEND', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
         'LEFTBRACE', 'RIGHTBRACE', 'LEFTBRACKET', 'RIGHTBRACKET', 'PERIOD',
@@ -181,9 +182,9 @@ class HclParser(object):
         p[0] = p[1]
         
     def p_number_1(self, p):
-        "number : int frac"
+        "number : float"
         #self.print_p(p)
-        p[0] = float("{0}.{1}".format(p[1], p[2]))
+        p[0] = float(p[1])
         
     def p_number_2(self, p):
         "number : int exp"
@@ -191,9 +192,9 @@ class HclParser(object):
         p[0] = float("{0}{1}".format(p[1], p[2]))
         
     def p_number_3(self, p):
-        "number : int frac exp"
+        "number : float exp"
         #self.print_p(p)
-        p[0] = float("{0}.{1}{2}".format(p[1], p[2], p[3]))
+        p[0] = float("{0}{1}".format(p[1], p[2]))
         
     def p_int_0(self, p):
         "int : MINUS int"
@@ -205,6 +206,14 @@ class HclParser(object):
         #self.print_p(p)
         p[0] = p[1]
         
+    def p_float_0(self, p):
+        "float : MINUS float"
+        p[0] = p[2] * -1
+        
+    def p_float_1(self, p):
+        "float : FLOAT"
+        p[0] = p[1]
+        
     def p_exp_0(self, p):
         "exp : EPLUS NUMBER"
         #self.print_p(p)
@@ -214,11 +223,6 @@ class HclParser(object):
         "exp : EMINUS NUMBER"
         #self.print_p(p)
         p[0] = "e-{0}".format(p[2])
-        
-    def p_frac(self, p):
-        "frac : PERIOD NUMBER"
-        #self.print_p(p)
-        p[0] = p[2]
    
     
     # useful for debugging the parser

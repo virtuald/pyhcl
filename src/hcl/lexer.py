@@ -223,18 +223,28 @@ class Lexer(object):
     def lexNumber(self):
         
         startPos = self.pos+1
+        gotPeriod = False
         
         while True:
             c = self.next()
             if c is None:
                 return self.createErr("EOF in middle of number")
             
-            if c < '0' or c > '9':
+            if c == '.':
+                if gotPeriod:
+                    self.backup()
+                    break
+                gotPeriod = True
+            elif c < '0' or c > '9':
                 self.backup()
                 break
         
-        value = int(self.input[startPos:self.pos+1])
-        return LexToken(self, "NUMBER", value)
+        if not gotPeriod:
+            value = int(self.input[startPos:self.pos+1])
+            return LexToken(self, "NUMBER", value)
+        
+        value = float(self.input[startPos:self.pos+1])
+        return LexToken(self, "FLOAT", value)
             
         
     def lexString(self):
