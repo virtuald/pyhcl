@@ -6,7 +6,10 @@ import sys
 
 if sys.version_info[0] < 3:
     def u(s):
-        return unicode(s, 'utf-8')
+        if isinstance(s, unicode):
+            return s
+        else:
+            return unicode(s, 'utf-8')
 else:
     def u(s):
         if isinstance(s, bytes):
