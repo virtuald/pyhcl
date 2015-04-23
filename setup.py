@@ -6,8 +6,10 @@ from os.path import dirname, join, exists
 from distutils.core import setup
 
 try:
+    import pip
     from setuptools.command.install import install as _install
 except ImportError:
+    pip = None
     from distutils.command.install import install as _install
 
 import sys
@@ -60,6 +62,10 @@ with open(join(dirname(__file__), 'README.rst'), 'r') as readme_file:
 
 install_requires=open(join(setup_dir, 'requirements.txt')).readlines()
 
+# Install ply before we run setup, as using setup_requires is unreliable
+if pip is not None:
+    pip.main(['install', 'ply==3.4'])
+
 setup(name='pyhcl',
       version=get_version(),
       description='HCL configuration parser for python',
@@ -70,7 +76,6 @@ setup(name='pyhcl',
       package_dir={'': 'src'},
       packages=['hcl'],
       scripts=["scripts/hcltool"],
-      setup_requires=install_requires,
       install_requires=install_requires,
       cmdclass={'install': install},
       classifiers=[
