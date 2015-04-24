@@ -2,20 +2,18 @@
 
 from __future__ import print_function
 
-from os.path import dirname, join, exists
+from os.path import abspath, dirname, join, exists
 from distutils.core import setup
 
 try:
-    import pip
     from setuptools.command.install import install as _install
 except ImportError:
-    pip = None
     from distutils.command.install import install as _install
 
 import sys
 import subprocess
 
-setup_dir = dirname(__file__)
+setup_dir = abspath(dirname(__file__))
 version_file = join(setup_dir, 'src', 'hcl', 'version.py')
 
 def _post_install():
@@ -29,12 +27,6 @@ class install(_install):
     def run(self):
         _install.run(self)
         self.execute(_post_install, (), msg="Generating parse table...")
-
-def get_version():
-    d = {}
-    with open(version_file) as fp:
-        exec(compile(fp.read(), 'version.py', 'exec'), {}, d)
-    return d['__version__']
 
 # Automatically generate a version.py based on the git version
 if exists(join(setup_dir, '.git')):
@@ -60,14 +52,13 @@ if exists(join(setup_dir, '.git')):
 with open(join(dirname(__file__), 'README.rst'), 'r') as readme_file:
     long_description = readme_file.read()
 
+with open(version_file) as fp:
+    exec(compile(fp.read(), 'version.py', 'exec'), {}, locals())
+
 install_requires=open(join(setup_dir, 'requirements.txt')).readlines()
 
-# Install ply before we run setup, as using setup_requires is unreliable
-if pip is not None:
-    pip.main(['install', 'ply==3.4'])
-
 setup(name='pyhcl',
-      version=get_version(),
+      version=__version__,
       description='HCL configuration parser for python',
       long_description=long_description,
       author='Dustin Spicuzza',
@@ -76,6 +67,7 @@ setup(name='pyhcl',
       package_dir={'': 'src'},
       packages=['hcl'],
       scripts=["scripts/hcltool"],
+      setup_requires=install_requires,
       install_requires=install_requires,
       cmdclass={'install': install},
       classifiers=[
