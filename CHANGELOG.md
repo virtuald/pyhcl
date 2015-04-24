@@ -1,3 +1,11 @@
+0.1.11 (2015-04-24)
+-------------------
+* ply version requirement is now == 3.4
+
+0.1.9 (2015.04.19)
+------------------
+* Fix unicode error in python 2.x
+
 0.1.8 (2014-11-14)
 ------------------
 * Parse floats properly
