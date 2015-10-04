@@ -1,3 +1,7 @@
+0.1.12 (2015-10-04)
+-------------------
+* Move parsetab.dat to build_py step instead of post-install
+
 0.1.11 (2015-04-24)
 -------------------
 * ply version requirement is now == 3.4

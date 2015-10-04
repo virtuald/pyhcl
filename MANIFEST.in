@@ -4,5 +4,7 @@ include README.rst
 include LICENSE
 include CHANGELOG.md
 
+include src/hcl/parsetab.dat
+
 recursive-include tests *.py *.hcl *.json *.sh
 

@@ -5,6 +5,7 @@ __pycache__
 .coverage
 *.egg-info
 *.egg
+*.eggs
 
 .project
 .pydevproject
