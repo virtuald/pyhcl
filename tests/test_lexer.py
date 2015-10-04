@@ -15,6 +15,13 @@ class Error:
 LEX_FIXTURE_DIR = join(dirname(__file__), 'lex-fixtures')
 LEX_FIXTURES = [
     (
+        "array_comment.hcl",
+        ["IDENTIFIER", "EQUAL", "LEFTBRACKET",
+        "STRING", "COMMA",
+        "STRING", "COMMA",
+        "RIGHTBRACKET", None]
+    ),
+    (
         "comment.hcl",
         ["IDENTIFIER", "EQUAL", "STRING", None]
     ),
