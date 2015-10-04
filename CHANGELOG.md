@@ -1,3 +1,7 @@
+0.1.13 (2015-10-04)
+-------------------
+* Multi-line comments aren't allowed to terminate with EOF
+
 0.1.12 (2015-10-04)
 -------------------
 * Move parsetab.dat to build_py step instead of post-install
