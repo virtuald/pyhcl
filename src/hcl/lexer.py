@@ -100,8 +100,11 @@ class Lexer(object):
         while True:
             c = self.next()
             if c is None:
-                self.backup()
-                return True
+                # single-line comments can end with EOF
+                if single:
+                    self.backup()
+                    return True
+                return self.createErr("end of multi-line comment expected, got EOF")
             
             # Single line comments continue until a newline
             if single:

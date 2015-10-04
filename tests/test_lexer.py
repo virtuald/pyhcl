@@ -66,6 +66,10 @@ LEX_FIXTURES = [
             "RIGHTBRACE", None,
         ],
     ),
+    (
+        "unterminated_block_comment.hcl",
+        [Error]
+    )
 ]
 
 @pytest.mark.parametrize("hcl_fname,tokens", LEX_FIXTURES)
