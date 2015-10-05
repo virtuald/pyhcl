@@ -10,6 +10,7 @@ try:
 except ImportError:
     from distutils.command.build_py import build_py as _build_py
 
+import os
 import sys
 import subprocess
 

@@ -1,3 +1,7 @@
+0.1.14 (2015-10-05)
+-------------------
+* Fix regression in setup.py
+
 0.1.13 (2015-10-04)
 -------------------
 * Multi-line comments aren't allowed to terminate with EOF
