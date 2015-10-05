@@ -30,8 +30,6 @@ def _pre_install():
     import hcl
     from hcl.parser import HclParser
     parser = HclParser()
-    
-    print('exists', dat)
 
 
 class build_py(_build_py):
