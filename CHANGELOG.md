@@ -1,6 +1,7 @@
-0.1.14 (2015-10-05)
+0.1.15 (2015-10-05)
 -------------------
 * Fix regression in setup.py
+* Remove extra print statement from setup.py
 
 0.1.13 (2015-10-04)
 -------------------
