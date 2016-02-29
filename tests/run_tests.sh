@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cd `dirname $0`
-python -m coverage run --source hcl -m pytest $@
+pip install -e .
+python -m coverage run -m pytest tests
 if [ "$?" != "0" ]; then
 	exit 1
 fi
