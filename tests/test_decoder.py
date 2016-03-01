@@ -31,6 +31,7 @@ FIXTURES = [
     # ('structure_list.hcl', None, {'foo': [{'key': 7}, {'key': 12}]}), # nor this
     # 'structure_list_deep.json'
     ('structure_multi.hcl', 'structure_multi.json', None),
+    ('structure_multi_layers.hcl', 'structure_multi_layers.json', None),
     ('terraform_heroku.hcl', 'terraform_heroku.json', None)
 ]
 
