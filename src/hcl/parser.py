@@ -48,7 +48,6 @@ class HclParser(object):
     #
     # Yacc parser section
     #
-    
     def objectlist_flat(self, lt):
         '''
             Similar to the dict constructor, but handles dups
@@ -66,8 +65,12 @@ class HclParser(object):
         for k,v in lt:
             if isinstance(v, dict):
                 dd = d.setdefault(k, {})
-                for kk,vv in iteritems(v):
-                    dd[kk] = vv
+                for kk, vv in iteritems(v):
+                    if kk in dd.keys():
+                        for k2, v2 in iteritems(vv):
+                            dd[kk][k2] = v2
+                    else:
+                        dd[kk] = vv
             else:
                 d[k] = v
             
