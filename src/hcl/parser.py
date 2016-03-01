@@ -67,7 +67,13 @@ class HclParser(object):
             if isinstance(v, dict):
                 dd = d.setdefault(k, {})
                 for kk, vv in iteritems(v):
-                    dd[kk] = vv
+                    if kk in dd.keys():
+                        if isinstance(dd[kk], list):
+                            dd[kk].append(vv)
+                        else:
+                            dd[kk] = [dd[kk], vv]
+                    else:
+                        dd[kk] = vv
             else:
                 d[k] = v
 
