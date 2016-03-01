@@ -1,3 +1,11 @@
+0.2.0 (2016-02-29)
+-------------------
+* Added support for three tiered structures:
+
+    key1 "key2" "key3" {
+        name = value
+    }
+
 0.1.15 (2015-10-05)
 -------------------
 * Fix regression in setup.py
