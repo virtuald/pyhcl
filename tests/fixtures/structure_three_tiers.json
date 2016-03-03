@@ -1,0 +1,34 @@
+{
+  "foo": {
+    "bar": {
+      "baz": {
+        "key": 4
+      },
+      "qux": {
+        "key": 5
+      },
+      "biz": {
+        "key": 11
+      }
+    }
+  },
+  "bar": {
+    "foo": {
+      "qux": {
+        "key": 8
+      },
+      "biz": {
+        "key": 9,
+        "key2": 3
+      }
+    }
+  },
+  "baz": {
+    "foo": {
+      "biz": {
+        "key": 9,
+        "key5": "somestring"
+      }
+    }
+  }
+}
