@@ -1,4 +1,4 @@
-0.2.0 (2016-02-29)
+0.2.0 (2016-03-03)
 -------------------
 * Added support for three tiered structures:
 
