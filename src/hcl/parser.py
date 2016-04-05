@@ -7,6 +7,8 @@ from ply import lex, yacc
 
 import inspect
 
+DEBUG = False
+
 # When using something like pyinstaller, the __file__ attribute isn't actually
 # set correctly, so the parse file isn't able to be saved anywhere sensible.
 # In these cases, just use a temporary directory, it doesn't take too long to
@@ -46,7 +48,6 @@ class HclParser(object):
     #
     # Yacc parser section
     #
-    
     def objectlist_flat(self, lt):
         '''
             Similar to the dict constructor, but handles dups
@@ -64,8 +65,12 @@ class HclParser(object):
         for k,v in lt:
             if isinstance(v, dict):
                 dd = d.setdefault(k, {})
-                for kk,vv in iteritems(v):
-                    dd[kk] = vv
+                for kk, vv in iteritems(v):
+                    if kk in dd.keys():
+                        for k2, v2 in iteritems(vv):
+                            dd[kk][k2] = v2
+                    else:
+                        dd[kk] = vv
             else:
                 d[k] = v
             
@@ -73,29 +78,34 @@ class HclParser(object):
     
     def p_top(self, p):
         "top : objectlist"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = self.objectlist_flat(p[1])
     
     
     def p_objectlist_0(self, p):
         "objectlist : objectitem"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = [p[1]]
     
     def p_objectlist_1(self, p):
         "objectlist : objectlist objectitem"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1] + [p[2]]
     
     
     def p_object_0(self, p):
         "object : LEFTBRACE objectlist RIGHTBRACE"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = self.objectlist_flat(p[2])
         
     def p_object_1(self, p):
         "object : LEFTBRACE RIGHTBRACE"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = {}
     
     def p_objectkey_0(self, p):
@@ -103,7 +113,8 @@ class HclParser(object):
         objectkey : IDENTIFIER
                   | STRING
         '''
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
     
     def p_objectitem_0(self, p):
@@ -114,23 +125,27 @@ class HclParser(object):
                    | objectkey EQUAL object
                    | objectkey EQUAL list
         '''
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = (p[1], p[3])
     
     def p_objectitem_1(self, p):
         "objectitem : block"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
     
     
     def p_block_0(self, p):
         "block : blockId object"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = (p[1], p[2])
         
     def p_block_1(self, p):
         "block : blockId block"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = (p[1], {p[2][0]: p[2][1]})
         
     def p_blockId(self, p):
@@ -138,34 +153,40 @@ class HclParser(object):
         blockId : IDENTIFIER
                 | STRING
         '''
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
     
     
     def p_list_0(self, p):
         "list : LEFTBRACKET listitems RIGHTBRACKET"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[2]
         
     def p_list_1(self, p):
         "list : LEFTBRACKET RIGHTBRACKET"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = []
         
         
     def p_listitems_0(self, p):
         "listitems : listitem"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = [p[1]]
         
     def p_listitems_1(self, p):
         "listitems : listitems COMMA listitem"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1] + [p[3]]
     
     def p_listitems_2(self, p):
         "listitems : listitems COMMAEND"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
         
     def p_listitem(self, p):
@@ -173,37 +194,44 @@ class HclParser(object):
         listitem : number
                  | STRING
         '''
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
         
     def p_number_0(self, p):
         "number : int"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
         
     def p_number_1(self, p):
         "number : float"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = float(p[1])
         
     def p_number_2(self, p):
         "number : int exp"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = float("{0}{1}".format(p[1], p[2]))
         
     def p_number_3(self, p):
         "number : float exp"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = float("{0}{1}".format(p[1], p[2]))
         
     def p_int_0(self, p):
         "int : MINUS int"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = -p[2]
         
     def p_int_1(self, p):
         "int : NUMBER"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = p[1]
         
     def p_float_0(self, p):
@@ -216,21 +244,23 @@ class HclParser(object):
         
     def p_exp_0(self, p):
         "exp : EPLUS NUMBER"
-        #self.print_p(p)
-        p[0] = "e{0}".format(p[2]) 
-        
+        if DEBUG:
+            self.print_p(p)
+        p[0] = "e{0}".format(p[2])
+
     def p_exp_1(self, p):
         "exp : EMINUS NUMBER"
-        #self.print_p(p)
+        if DEBUG:
+            self.print_p(p)
         p[0] = "e-{0}".format(p[2])
    
     
     # useful for debugging the parser
-    #def print_p(self, p):
-    #    name = inspect.getouterframes(inspect.currentframe(), 2)[1][3]
-    #    print('%20s: %s' % (name, ' | '.join([str(p[i]) for i in range(0, len(p))])))
-    
-    
+    def print_p(self, p):
+        if DEBUG:
+            name = inspect.getouterframes(inspect.currentframe(), 2)[1][3]
+            print('%20s: %s' % (name, ' | '.join([str(p[i]) for i in range(0, len(p))])))
+
     def p_error(self, p):
         # Derived from https://groups.google.com/forum/#!topic/ply-hack/spqwuM1Q6gM
         
