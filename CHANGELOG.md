@@ -1,3 +1,7 @@
+0.2.1 (2016-04-14)
+------------------
+* Fixes for mutliple configuration blocks with same name
+
 0.2.0 (2016-03-03)
 -------------------
 * Added support for three tiered structures:
