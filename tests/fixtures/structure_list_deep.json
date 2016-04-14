@@ -8,6 +8,9 @@
                 },
                 {
                     "from_port": 80
+                },
+                {
+                    "from_port": 51
                 }
             ]
         }
