@@ -48,7 +48,7 @@ class HclParser(object):
     #
     # Yacc parser section
     #
-    def objectlist_flat(self, lt):
+    def objectlist_flat(self, lt, replace):
         '''
             Similar to the dict constructor, but handles dups
             
@@ -63,24 +63,30 @@ class HclParser(object):
         d = {}
         
         for k,v in lt:
-            if isinstance(v, dict):
-                dd = d.setdefault(k, {})
-                for kk, vv in iteritems(v):
-                    if kk in dd.keys():
-                        for k2, v2 in iteritems(vv):
-                            dd[kk][k2] = v2
-                    else:
-                        dd[kk] = vv
+            if k in d.keys() and not replace:
+                if type(d[k]) is list:
+                    d[k].append(v)
+                else:
+                    d[k] = [d[k],v]
             else:
-                d[k] = v
-            
+                if isinstance(v, dict):
+                    dd = d.setdefault(k, {})
+                    for kk, vv in iteritems(v):
+                        if kk in dd.keys():
+                            for k2, v2 in iteritems(vv):
+                                dd[kk][k2] = v2
+                        else:
+                            dd[kk] = vv
+                else:
+                    d[k] = v
+
         return d
     
     def p_top(self, p):
         "top : objectlist"
         if DEBUG:
             self.print_p(p)
-        p[0] = self.objectlist_flat(p[1])
+        p[0] = self.objectlist_flat(p[1],True)
     
     
     def p_objectlist_0(self, p):
@@ -100,7 +106,7 @@ class HclParser(object):
         "object : LEFTBRACE objectlist RIGHTBRACE"
         if DEBUG:
             self.print_p(p)
-        p[0] = self.objectlist_flat(p[2])
+        p[0] = self.objectlist_flat(p[2],False)
         
     def p_object_1(self, p):
         "object : LEFTBRACE RIGHTBRACE"
