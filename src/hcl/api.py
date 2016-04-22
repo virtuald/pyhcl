@@ -1,8 +1,10 @@
-
 import json
+import os
+import re
+import sys
+
 from .parser import HclParser
 
-import sys
 
 if sys.version_info[0] < 3:
     def u(s):
@@ -39,6 +41,35 @@ def isHcl(s):
     raise ValueError("No HCL object could be decoded")
 
 
+def interpolate(data, variables):
+
+    variable_reo = re.compile(r'^\$\{var\.(\w+)\}$')
+    for key, value in data.iteritems():
+        if isinstance(value, dict):
+            interpolate(value, variables)
+        else:
+            if isinstance(value, basestring):
+                match = variable_reo.match(value)
+                if match is not None:
+                    variable_name = match.groups(1)[0]
+                    try:
+                        default = variables[variable_name].get('default', '')
+                    except KeyError:
+                        default = None
+                    data[key] = os.environ.get('TF_{}'.format(variable_name), default)
+
+
+def interpolate_variables(base_path, data):
+    variables_path = os.path.join(base_path, 'variables.tf')
+    if os.path.exists(variables_path):
+        with open(variables_path, 'r') as variables_fp:
+            variables = HclParser().parse(variables_fp.read())['variable']
+    else:
+        variables = {}
+    interpolate(data, variables)
+    return data
+
+
 def load(fp):
     '''
         Deserializes a file-pointer like object into a python dictionary.
@@ -48,7 +79,9 @@ def load(fp):
         
         :returns: Dictionary
     '''
-    return loads(fp.read())
+    data = loads(fp.read())
+    fp_path = os.path.split(fp.name)[0]
+    return interpolate_variables(fp_path, data)
 
 def loads(s):
     '''
@@ -62,9 +95,7 @@ def loads(s):
         return HclParser().parse(s)
     else:
         return json.loads(s)
-    
 
 def dumps(*args, **kwargs):
     '''Turns a dictionary into JSON, passthru to json.dumps'''
     return json.dumps(*args, **kwargs)
-

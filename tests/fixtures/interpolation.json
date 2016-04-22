@@ -1,7 +1,7 @@
 {
   "foo": {
-      "default_variable": 6,
-      "no_default": "",
-      "env_override": 8
+    "has_default": "6",
+    "no_default": "",
+    "env_override": "8"
   }
 }
