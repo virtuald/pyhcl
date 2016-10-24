@@ -29,7 +29,7 @@ use the json module in python, and load/loads/dumps are implemented.
 
     import hcl
 
-    with open('file.hcl', r) as fp:
+    with open('file.hcl', 'r') as fp:
         obj = hcl.load(fp)
 
 Currently the dumps function outputs JSON, and not HCL.
