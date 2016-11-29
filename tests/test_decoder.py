@@ -25,10 +25,11 @@ FIXTURES = [
     ('multiline_bad.hcl', 'multiline.json', None),
     ('scientific.hcl', 'scientific.json', None),
     ('structure.hcl', 'structure_flat.json', None),
-    #('structure2.hcl', 'structure2.json'),  # not in the golang tests
-    #('structure_flatmap.hcl', 'structure_flat.json'),
-    #('structure_list.hcl', 'structure_list.json'), # these don't match in golang either
-    #('structure_list.hcl', None, {'foo': [{'key': 7}, {'key': 12}]}), # nor this
+    #('structure2.hcl', 'structure2.json', None),  # not in the golang tests
+    ('structure_flatmap.hcl', 'structure_flatmap.json', None),
+    ('structure_list.hcl', 'structure_list.json', None), # these don't match in golang either
+    ('structure_list.hcl', None, {'foo': [{'key': 7}, {'key': 12}]}), # nor this
+    ('issue12.hcl', 'issue12.json', None),
     #'structure_list_deep.json'
     ('structure_multi.hcl', 'structure_multi.json', None),
     ('structure_three_tiers.hcl', 'structure_three_tiers.json', None),
