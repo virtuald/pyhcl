@@ -42,12 +42,6 @@ LEX_FIXTURES = [
         ],
     ),
     (
-        "old.hcl",
-        [
-            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", Error
-        ],
-    ),
-    (
         "structure_basic.hcl",
         [
             "IDENTIFIER", "LEFTBRACE",
@@ -66,10 +60,26 @@ LEX_FIXTURES = [
             "RIGHTBRACE", None,
         ],
     ),
+]
+
+LEX_ERROR_FIXTURES = [
+    (
+        "old.hcl",
+        [
+            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", Error
+        ],
+        "Line 2, column 15"
+    ),
     (
         "unterminated_block_comment.hcl",
-        [Error]
-    )
+        [Error],
+        "Line 3, column 0"
+    ),
+    (
+        "nested_comment.hcl",
+        [Error],
+        "Line 5, column 0"
+    ),
 ]
 
 @pytest.mark.parametrize("hcl_fname,tokens", LEX_FIXTURES)
@@ -84,11 +94,7 @@ def test_lexer(hcl_fname, tokens):
     lexer.input(input)
 
     for tok in tokens:
-        try:
-            lex_tok = lexer.token()
-        except ValueError:
-            assert tok is Error
-            return
+        lex_tok = lexer.token()
             
         if lex_tok is None:
             assert tok is None
@@ -98,3 +104,27 @@ def test_lexer(hcl_fname, tokens):
             
     assert lexer.token() is None
 
+@pytest.mark.parametrize("hcl_fname,tokens,error_loc", LEX_ERROR_FIXTURES)
+def test_lexer(hcl_fname, tokens, error_loc):
+
+    with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
+        input = fp.read()
+
+    print(input)
+
+    lexer = hcl.lexer.Lexer()
+    lexer.input(input)
+
+    for tok in tokens:
+        try:
+            lex_tok = lexer.token()
+        except ValueError as e:
+            assert tok is Error
+            assert error_loc in str(e)
+            return
+
+        if lex_tok is None:
+            assert tok is None
+        else:
+            assert tok == lex_tok.type
+        print(lex_tok)
