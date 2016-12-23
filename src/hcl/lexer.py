@@ -86,48 +86,33 @@ class Lexer(object):
                 return self.lexId()
             
     def consumeComment(self, c):
-        single = (c == '#')
-        if not single:
-            c = self.next()
-            if c not in "/*":
+        # single line comments
+        if c == "#" or (c == "/" and self.peek() != "*"):
+            if c == "/" and self.peek() != "/":
                 self.backup()
-                return self.createErr("comment expected, got %s" % c)
+                return self.createErr("expected '/' for comment, got %s" % c)
             
-            single = (c == "/")
-            
-        nested = 1
-        
-        while True:
             c = self.next()
+            while (c != "\n" and c is not None):
+                c = self.next()
+            if (c is not None):
+                self.backup()
+            return True
+
+        # be sure we get the character after /* This allows us to find comment's
+        # that are not terminated
+        if c == "/":
+            self.next()
+            # read character after "/*"
+            c = self.next()
+
+        # look for /* - style comments
+        while True:
             if c is None:
-                # single-line comments can end with EOF
-                if single:
-                    self.backup()
-                    return True
                 return self.createErr("end of multi-line comment expected, got EOF")
-            
-            # Single line comments continue until a newline
-            if single:
-                if c == "\n":
-                    return True
-                
-            # Multi-line comments continue until a */
-            if c == "/":
-                c = self.next()
-                if c == "*":
-                    nested += 1
-                else:
-                    self.backup()
-            
-            elif c == "*":
-                c = self.next()
-                if c == "/":
-                    nested -= 1
-                else:
-                    self.backup()
-            
-            # If we're done with the comment, return!
-            if nested == 0:
+            c0 = c
+            c = self.next()
+            if c0 == "*" and c == "/":
                 return True
     
     def lexComma(self):
