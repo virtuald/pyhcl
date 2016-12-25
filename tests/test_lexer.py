@@ -105,7 +105,7 @@ def test_lexer(hcl_fname, tokens):
     assert lexer.token() is None
 
 @pytest.mark.parametrize("hcl_fname,tokens,error_loc", LEX_ERROR_FIXTURES)
-def test_lexer(hcl_fname, tokens, error_loc):
+def test_lexer_errors(hcl_fname, tokens, error_loc):
 
     with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
         input = fp.read()
