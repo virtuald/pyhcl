@@ -1,308 +1,206 @@
-'''
-    Originally tried to use the lexer that comes with ply, but couldn't
-    figure out a good way to deal with nested comments. This implementation
-    very closely follows the golang lexer implementation.
-'''
+import re
+import sys
+import ply.lex as lex
 
-class LexToken(object):
-    def __init__(self, lexer, tok_type, value=None):
-        self.type = tok_type
-        self.value = value
-        self.lineno = lexer.line
-        self.lexpos = lexer.pos
-    
-    def __str__(self):
-        return "LexToken(%s,%r,%d,%d)" % (self.type,self.value,self.lineno,self.lexpos)
-    
-    def __repr__(self):
-        return str(self)
+if sys.version_info < (3,):
+    text_type = unicode
+else:
+    text_type = str
+
+def _raise_error(t, message=None):
+    lexpos = t.lexer.lexpos
+    lexdata = t.lexer.lexdata
+    lineno = t.lexer.lineno
+    column = _find_column(lexdata, t)
+    if message is None:
+        message = "Illegal character '%s'" % lexdata[lexpos]
+    raise ValueError("Line %d, column %d, index %d: %s" % (lineno, column, lexpos, message))
+
+def _find_column(input, token):
+    last_cr = input.rfind('\n', 0, token.lexpos)
+    column = (token.lexpos - last_cr) - 1
+    return column
 
 class Lexer(object):
-    
+
+    tokens = (
+        'BOOL',
+        'FLOAT',
+        'NUMBER',
+        'COMMA', 'COMMAEND', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
+        'LEFTBRACE', 'RIGHTBRACE', 'LEFTBRACKET', 'RIGHTBRACKET', 'PERIOD',
+        'EPLUS', 'EMINUS',
+    )
+
+    states = (
+        ('stringdollar', 'exclusive'),
+        ('string', 'exclusive'),
+        ('heredoc', 'exclusive'),
+    )
+
+    def t_BOOL(self, t):
+        r'(true)|(false)'
+        return t
+
+    def t_EMINUS(self, t):
+        r'(?<=\d|\.)[eE]-'
+        return t
+
+    def t_EPLUS(self, t):
+        r'(?<=\d|\.)[eE]\+?'
+        return t
+
+    def t_FLOAT(self, t):
+        r'-?((\d+\.\d*)|(\d*\.\d+))'
+        t.value = float(t.value)
+        return t
+
+    def t_hexnumber(self, t):
+        r'-?0[xX][0-9a-fA-F]+'
+        t.value = int(t.value, base=16)
+        t.type = 'NUMBER'
+        return t
+
+    def t_intnumber(self, t):
+        r'-?\d+'
+        t.value = int(t.value)
+        t.type = 'NUMBER'
+        return t
+
+    def t_PERIOD(self, t):
+        r'\.'
+        return t
+
+    def t_COMMAEND(self, t):
+        r',(?=\s*\])'
+        return t
+
+    def t_COMMA(self, t):
+        r','
+        return t
+
+    def t_IDENTIFIER(self, t):
+        r'[^\W\d][\w.-]*'
+        t.value = text_type(t.value)
+        return t
+
+    # Strings
+    def t_string(self, t):
+        # Start of a string
+        r'\"'
+        # abs_start is the absolute start of the string. We use this at the end
+        # to know how many new lines we've consumed
+        t.lexer.abs_start = t.lexer.lexpos
+        # rel_pos is the begining of the unconsumed part of the string. It will
+        # get modified when consuming escaped characters
+        t.lexer.rel_pos = t.lexer.lexpos
+        # The value of the consumed part of the string
+        t.lexer.string_value = u''
+        t.lexer.begin('string')
+
+    def t_string_escapedchar(self, t):
+        # If a quote or backslash is escaped, build up the string by ignoring
+        # the escape character. Should this be done for other characters?
+        r'(?<=\\)(\"|\\)'
+        t.lexer.string_value += t.lexer.lexdata[t.lexer.rel_pos:t.lexer.lexpos - 2] + t.value
+        t.lexer.rel_pos = t.lexer.lexpos
+        pass
+
+    def t_string_ignoring(self, t):
+        # Ignore everything except for a quote or a left brace
+        r'[^\"\{]'
+        pass
+
+    def t_string_STRING(self, t):
+        # End of the string
+        r'\"'
+        t.value = t.lexer.string_value + t.lexer.lexdata[t.lexer.rel_pos:t.lexer.lexpos - 1]
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos - 1].count('\n')
+        t.lexer.begin('INITIAL')
+        return t
+
+    def t_string_stringdollar(self, t):
+        # Left brace preceeded by a dollar
+        r'(?<=\$)\{'
+        t.lexer.braces = 1
+        t.lexer.begin('stringdollar')
+
+    def t_stringdollar_dontcare(self, t):
+        # Ignore everything except for braces
+        r'[^\{\}]'
+        pass
+
+    def t_stringdollar_lbrace(self, t):
+        r'\{'
+        t.lexer.braces += 1
+
+    def t_stringdollar_rbrace(self, t):
+        r'\}'
+        t.lexer.braces -= 1
+
+        if t.lexer.braces == 0:
+            # End of the dollar brace, back to the rest of the string
+            t.lexer.begin('string')
+
+    def t_heredoc(self, t):
+        r'<<.*'
+        t.lexer.here_start = t.lexer.lexpos
+        t.lexer.here_identifier = t.value[2:]
+        t.lexer.begin('heredoc')
+
+    def t_heredoc_STRING(self, t):
+        r'^\S+$'
+        if t.value == t.lexer.here_identifier:
+            # Need to subtrace the identifier and \n from the lexpos to get the
+            # endpos
+            endpos = t.lexer.lexpos - (1 + len(t.lexer.here_identifier))
+            # The startpos is one character after the here_start to account for
+            # the newline
+            t.value = t.lexer.lexdata[t.lexer.here_start + 1:endpos]
+            t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
+            t.lexer.begin('INITIAL')
+            return t
+
+    def t_heredoc_ignoring(self, t):
+        r'.+|\n'
+        pass
+
+    t_EQUAL = r'='
+    t_MINUS = r'-'
+
+    t_LEFTBRACE = r'\{'
+    t_RIGHTBRACE = r'\}'
+    t_LEFTBRACKET = r'\['
+    t_RIGHTBRACKET = r'\]'
+
+    def t_COMMENT(self, t):
+        r'(\#|(//)).*'
+        pass
+
+    def t_MULTICOMMENT(self, t):
+        r'/\*(.|\n)*?(\*/)'
+        t.lexer.lineno += t.value.count('\n')
+        pass
+
+    # Define a rule so we can track line numbers
+    def t_newline(self, t):
+        r'\n+'
+        t.lexer.lineno += len(t.value)
+
+    t_ignore = ' \t\r\f\v'
+
+    # Error handling rule
+    def t_error(self, t):
+        if t.value.startswith('/*'):
+            _raise_error(t, 'EOF before closing multiline comment')
+        else:
+            _raise_error(t)
+
+    def __init__(self):
+        self.lex = lex.lex(module=self, debug=False, reflags=(re.UNICODE | re.MULTILINE))
+
     def input(self, s):
-        self.input = s
-        self.pos = -1
-        self.col = 0
-        self.line = 1
-        self.lastNumber = False
-    
+        return self.lex.input(s)
+
     def token(self):
-        
-        while True:
-            
-            c = self.next()
-            if c is None:
-                return None
-            
-            if c.isspace():
-                self.lastNumber = False
-                continue
-            
-            if c in "#/":
-                self.consumeComment(c)
-                continue
-            
-            if c >= '0' and c <= '9':
-                self.lastNumber = True
-                self.backup()
-                return self.lexNumber()
-            
-            # This is a hacky way to find 'e' and lex it, but it works
-            if self.lastNumber:
-                if c in 'eE':
-                    next = self.next()
-                    if next == '+':
-                        return LexToken(self, "EPLUS")
-                    elif next == '-':
-                        return LexToken(self, "EMINUS")
-                    else:
-                        self.backup()
-                        return LexToken(self, "EPLUS")
-            
-            self.lastNumber = False
-            
-            if c == ".":
-                return LexToken(self, "PERIOD")
-            elif c == "-":
-                return LexToken(self, "MINUS")
-            elif c == ",":
-                return self.lexComma()
-            elif c == "=":
-                return LexToken(self, "EQUAL")
-            elif c == "[":
-                return LexToken(self, "LEFTBRACKET")
-            elif c == "]":
-                return LexToken(self, "RIGHTBRACKET")
-            elif c == "{":
-                return LexToken(self, "LEFTBRACE")
-            elif c == "}":
-                return LexToken(self, "RIGHTBRACE")
-            elif c == '"':
-                return self.lexString()
-            elif c == "<":
-                return self.lexHeredoc()
-            else:
-                self.backup()
-                return self.lexId()
-            
-    def consumeComment(self, c):
-        # single line comments
-        if c == "#" or (c == "/" and self.peek() != "*"):
-            if c == "/" and self.peek() != "/":
-                self.backup()
-                return self.createErr("expected '/' for comment, got %s" % c)
-            
-            c = self.next()
-            while (c != "\n" and c is not None):
-                c = self.next()
-            if (c is not None):
-                self.backup()
-            return True
-
-        # be sure we get the character after /* This allows us to find comment's
-        # that are not terminated
-        if c == "/":
-            self.next()
-            # read character after "/*"
-            c = self.next()
-
-        # look for /* - style comments
-        while True:
-            if c is None:
-                return self.createErr("end of multi-line comment expected, got EOF")
-            c0 = c
-            c = self.next()
-            if c0 == "*" and c == "/":
-                return True
-    
-    def lexComma(self):
-
-        while True:
-            c = self.peek()
-
-            if c.isspace():
-                self.next()
-                continue
-
-            if c == "]":
-                return LexToken(self, "COMMAEND")
-
-            break
-
-        return LexToken(self, "COMMA")
-
-    def lexId(self):
-        
-        startPos = self.pos+1
-        
-        while True:
-            c = self.next()
-            if c is None:
-                return self.createErr("EOF found when parsing identifier")
-            
-            if not c.isalnum() and c not in "_-":
-                self.backup()
-                break
-        
-        if startPos >= self.pos+1:
-            return self.createErr("Unexpected character '%s'" % c)
-         
-        value = self.input[startPos:self.pos+1]
-        
-        if value == 'true':
-            return LexToken(self, "BOOL", True)
-        
-        elif value == 'false':
-            return LexToken(self, "BOOL", False)
-        
-        return LexToken(self, "IDENTIFIER", value)
-        
-        
-    def lexHeredoc(self):
-        
-        if self.next() != "<":
-            return self.createErr("Heredoc must start with <<")
-        
-        startPos = self.pos
-        
-        # Now determine the marker
-        while True:
-            c = self.next()
-            if c is None:
-                return self.createErr("EOF reached when parsing heredoc")
-            
-            # Newline signals the end of the marker
-            if c == "\n":
-                break
-            
-        marker = self.input[startPos+1:self.pos]
-        if marker == "":
-            return self.createErr("Heredoc must have a marker, e.g. <<FOO")
-        
-        check = True
-        startPos = self.pos+1
-        
-        while True:
-            c = self.next()
-            
-            # If we're checking, then check to see if we see the marker
-            if check:
-                check = False
-                
-                for i in marker:
-                    if i != c:
-                        break
-                    
-                    c = self.next()
-                else:
-                    break
-                
-            if c is None:
-                return self.createErr("End of heredoc not found")
-                
-            if c == "\n":
-                check = True
-                endPos = self.pos
-                
-        value = self.input[startPos:endPos]
-        return LexToken(self, "STRING", value)
-            
-        
-    def lexNumber(self):
-        
-        startPos = self.pos+1
-        gotPeriod = False
-        
-        while True:
-            c = self.next()
-            if c is None:
-                return self.createErr("EOF in middle of number")
-            
-            if c == '.':
-                if gotPeriod:
-                    self.backup()
-                    break
-                gotPeriod = True
-            elif c < '0' or c > '9':
-                self.backup()
-                break
-        
-        if not gotPeriod:
-            value = int(self.input[startPos:self.pos+1])
-            return LexToken(self, "NUMBER", value)
-        
-        value = float(self.input[startPos:self.pos+1])
-        return LexToken(self, "FLOAT", value)
-            
-        
-    def lexString(self):
-        
-        b = []
-        braces = 0
-        
-        while True:
-            c = self.next()
-            if c is None:
-                return self.createErr("EOF before string closed")
-            
-            if c == '"' and braces == 0:
-                break
-            
-            # If we hit a newline, then its an error
-            if c == '\n':
-                return self.createErr("Newline before string closed")
-
-            # If we're escaping a quote, then escape the quote
-            if c == '\\':
-                n = self.next()
-                if n == '"':
-                    c = n
-                elif n == 'n':
-                    c = '\n'
-                elif n == '\\':
-                    c = n
-                else:
-                    self.backup()
-                
-            if braces == 0 and c == "$" and self.peek() == "{":
-                braces = 1
-                b.append(c)
-                c = self.next()   
-            elif braces > 0 and c == "{":
-                braces += 1
-                
-            if braces > 0 and c == "}":
-                braces -= 1
-
-            b.append(c)
-        
-        return LexToken(self, "STRING", ''.join(b))
-    
-    def next(self):
-        
-        if self.pos+1 >= len(self.input):
-            self.w = 0
-            return None
-        
-        self.pos += 1
-        self.col += 1
-        self.w = 1
-        
-        r = self.input[self.pos]
-        if r == '\n':
-            self.line += 1
-            self.col = 0
-        
-        return r
-    
-    def peek(self):
-        c = self.next()
-        self.backup()
-        return c
-    
-    def backup(self):
-        self.col -= 1
-        self.pos -= self.w
-        
-    def createErr(self, msg):
-        raise ValueError("Line %d, column %d: %s" % (self.line, self.col, msg))
+        return self.lex.token()
