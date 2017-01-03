@@ -244,6 +244,7 @@ TOKEN_FIXTURES = [
     ("STRING", '" "'),
     ("STRING", '"a"'),
     ("STRING", '"本"'),
+    ("STRING", '"{f}"'),
     ("STRING", '"${file("foo")}"'),
     ("STRING", r'"${file(\"foo\")}"'),
     ("STRING", r'"\a"'),
