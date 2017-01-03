@@ -106,9 +106,15 @@ class Lexer(object):
         t.lexer.rel_pos = t.lexer.lexpos
         pass
 
+    def t_string_stringdollar(self, t):
+        # Left brace preceeded by a dollar
+        r'(?<=\$)\{'
+        t.lexer.braces = 1
+        t.lexer.begin('stringdollar')
+
     def t_string_ignoring(self, t):
-        # Ignore everything except for a quote or a left brace
-        r'[^\"\{]'
+        # Ignore everything except for a quote
+        r'[^\"]'
         pass
 
     def t_string_STRING(self, t):
@@ -122,12 +128,6 @@ class Lexer(object):
     def t_string_eof(self, t):
         t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos].count('\n')
         _raise_error(t, 'EOF before closing string quote')
-
-    def t_string_stringdollar(self, t):
-        # Left brace preceeded by a dollar
-        r'(?<=\$)\{'
-        t.lexer.braces = 1
-        t.lexer.begin('stringdollar')
 
     def t_stringdollar_dontcare(self, t):
         # Ignore everything except for braces
