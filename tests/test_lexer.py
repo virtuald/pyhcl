@@ -71,24 +71,62 @@ LEX_FIXTURES = [
     ),
 ]
 
+# The first value in the tuple can be either the file that will be read or just
+# a string
 LEX_ERROR_FIXTURES = [
     (
         "old.hcl",
         [
             "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", Error
         ],
-        "Line 2, column 15"
+        "Line 2, column 15, index 27: Illegal character ':'"
     ),
     (
         "unterminated_block_comment.hcl",
         [Error],
-        "Line 1, column 0"
+        "Line 1, column 0, index 0: EOF before closing multiline comment"
     ),
     (
         "nested_comment.hcl",
         [Error],
-        "Line 5, column 0"
+        "Line 5, column 0, index 13: Found '*/' before start of multiline comment"
     ),
+    (
+        "/not a comment",
+        [Error],
+        "Line 1, column 0, index 0: Expected '//' for comment, got '/n'"
+    ),
+    (
+        "a = <HERE\n"
+        "foobar\n"
+        "HERE",
+        ["IDENTIFIER", "EQUAL", Error],
+        "Line 1, column 4, index 4: Heredoc must start with '<<', got '<H'"
+    ),
+    (
+        "a = <<HE RE\n"
+        "foobar\n"
+        "HERE",
+        ["IDENTIFIER", "EQUAL", Error],
+        "Line 1, column 4, index 4: Heredoc must have a marker, e.g. '<<FOO'"
+    ),
+    (
+        "a = <<HERE\n"
+        "foobar\n",
+        ["IDENTIFIER", "EQUAL", Error],
+        "Line 3, column 0, index 18: EOF before closing heredoc"
+    ),
+    (
+        'a = "foo',
+        ["IDENTIFIER", "EQUAL", Error],
+        "Line 1, column 8, index 8: EOF before closing string quote"
+    ),
+    (
+        'a = "${foo"',
+        ["IDENTIFIER", "EQUAL", Error],
+        "Line 1, column 11, index 11: EOF before closing '${}' expression"
+    ),
+
 ]
 
 @pytest.mark.parametrize("hcl_fname,tokens", LEX_FIXTURES)
@@ -116,8 +154,11 @@ def test_lexer(hcl_fname, tokens):
 @pytest.mark.parametrize("hcl_fname,tokens,error_loc", LEX_ERROR_FIXTURES)
 def test_lexer_errors(hcl_fname, tokens, error_loc):
 
-    with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
-        input = fp.read()
+    if hcl_fname.endswith('.hcl'):
+        with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
+            input = fp.read()
+    else:
+        input = hcl_fname
 
     print(input)
 
@@ -129,7 +170,7 @@ def test_lexer_errors(hcl_fname, tokens, error_loc):
             lex_tok = lexer.token()
         except ValueError as e:
             assert tok is Error
-            assert error_loc in str(e)
+            assert error_loc == str(e)
             return
 
         if lex_tok is None:
@@ -204,23 +245,23 @@ TOKEN_FIXTURES = [
     ("STRING", '"a"'),
     ("STRING", '"本"'),
     ("STRING", '"${file("foo")}"'),
-    ("STRING", '"${file(\"foo\")}"'),
-    ("STRING", '"\a"'),
-    ("STRING", '"\b"'),
-    ("STRING", '"\f"'),
-    ("STRING", '"\n"'),
-    ("STRING", '"\r"'),
-    ("STRING", '"\t"'),
-    ("STRING", '"\v"'),
-    ("STRING", '"\""'),
-    ("STRING", '"\000"'),
-    ("STRING", '"\777"'),
-    ("STRING", '"\x00"'),
-    ("STRING", '"\xff"'),
-    ("STRING", '"\u0000"'),
-    ("STRING", '"\ufA16"'),
-    ("STRING", '"\U00000000"'),
-    ("STRING", '"\U0000ffAB"'),
+    ("STRING", r'"${file(\"foo\")}"'),
+    ("STRING", r'"\a"'),
+    ("STRING", r'"\b"'),
+    ("STRING", r'"\f"'),
+    ("STRING", r'"\n"'),
+    ("STRING", r'"\r"'),
+    ("STRING", r'"\t"'),
+    ("STRING", r'"\v"'),
+    ("STRING", r'"\""'),
+    ("STRING", r'"\000"'),
+    ("STRING", r'"\777"'),
+    ("STRING", r'"\x00"'),
+    ("STRING", r'"\xff"'),
+    ("STRING", r'"\u0000"'),
+    ("STRING", r'"\ufA16"'),
+    ("STRING", r'"\U00000000"'),
+    ("STRING", r'"\U0000ffAB"'),
     ("STRING", '"' + f100 + '"'),
 
     # Numbers

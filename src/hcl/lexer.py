@@ -119,6 +119,10 @@ class Lexer(object):
         t.lexer.begin('INITIAL')
         return t
 
+    def t_string_eof(self, t):
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos].count('\n')
+        _raise_error(t, 'EOF before closing string quote')
+
     def t_string_stringdollar(self, t):
         # Left brace preceeded by a dollar
         r'(?<=\$)\{'
@@ -142,8 +146,12 @@ class Lexer(object):
             # End of the dollar brace, back to the rest of the string
             t.lexer.begin('string')
 
+    def t_stringdollar_eof(self, t):
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos].count('\n')
+        _raise_error(t, "EOF before closing '${}' expression")
+
     def t_heredoc(self, t):
-        r'<<.*'
+        r'<<\S+(?=\n)'
         t.lexer.here_start = t.lexer.lexpos
         t.lexer.here_identifier = t.value[2:]
         t.lexer.begin('heredoc')
@@ -151,7 +159,7 @@ class Lexer(object):
     def t_heredoc_STRING(self, t):
         r'^\S+$'
         if t.value == t.lexer.here_identifier:
-            # Need to subtrace the identifier and \n from the lexpos to get the
+            # Need to subtract the identifier and \n from the lexpos to get the
             # endpos
             endpos = t.lexer.lexpos - (1 + len(t.lexer.here_identifier))
             # The startpos is one character after the here_start to account for
@@ -164,6 +172,10 @@ class Lexer(object):
     def t_heredoc_ignoring(self, t):
         r'.+|\n'
         pass
+
+    def t_heredoc_eof(self, t):
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
+        _raise_error(t, 'EOF before closing heredoc')
 
     t_EQUAL = r'='
     t_MINUS = r'-'
@@ -193,6 +205,16 @@ class Lexer(object):
     def t_error(self, t):
         if t.value.startswith('/*'):
             _raise_error(t, 'EOF before closing multiline comment')
+        elif t.value.startswith('*/'):
+            _raise_error(t, "Found '*/' before start of multiline comment")
+        elif t.value.startswith('/'):
+            c = t.value[1]
+            _raise_error(t, "Expected '//' for comment, got '/%s'" % c)
+        elif t.value.startswith('<<'):
+            _raise_error(t, "Heredoc must have a marker, e.g. '<<FOO'")
+        elif t.value.startswith('<'):
+            c = t.value[1]
+            _raise_error(t, "Heredoc must start with '<<', got '<%s'" % c)
         else:
             _raise_error(t)
 
