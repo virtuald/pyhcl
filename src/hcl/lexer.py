@@ -219,7 +219,7 @@ class Lexer(object):
             _raise_error(t)
 
     def __init__(self):
-        self.lex = lex.lex(module=self, debug=False, reflags=(re.UNICODE | re.MULTILINE))
+        self.lex = lex.lex(module=self, debug=False, reflags=(re.UNICODE | re.MULTILINE), errorlog=lex.NullLogger())
 
     def input(self, s):
         return self.lex.input(s)
