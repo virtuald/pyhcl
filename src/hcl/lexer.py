@@ -40,6 +40,7 @@ class Lexer(object):
 
     def t_BOOL(self, t):
         r'(true)|(false)'
+        t.value = (t.value == 'true')
         return t
 
     def t_EMINUS(self, t):
