@@ -30,6 +30,7 @@ FIXTURES = [
     ('structure_list.hcl', 'structure_list.json', None), # these don't match in golang either
     ('structure_list.hcl', None, {'foo': [{'key': 7}, {'key': 12}]}), # nor this
     ('structure_list2.hcl', 'structure_list2.json', None),
+    ('structure_list3.hcl', 'structure_list3.json', None),
     ('issue12.hcl', 'issue12.json', None),
     #'structure_list_deep.json'
     ('structure_multi.hcl', 'structure_multi.json', None),
