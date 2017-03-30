@@ -27,7 +27,7 @@ class Lexer(object):
         'BOOL',
         'FLOAT',
         'NUMBER',
-        'COMMA', 'COMMAEND', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
+        'COMMA', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
         'LEFTBRACE', 'RIGHTBRACE', 'LEFTBRACKET', 'RIGHTBRACKET', 'PERIOD',
         'EPLUS', 'EMINUS',
     )
@@ -70,10 +70,6 @@ class Lexer(object):
 
     def t_PERIOD(self, t):
         r'\.'
-        return t
-
-    def t_COMMAEND(self, t):
-        r',(?=\s*\])'
         return t
 
     def t_COMMA(self, t):

@@ -13,6 +13,7 @@ import pytest
 # hcl, json, dict
 FIXTURE_DIR = join(dirname(__file__), 'fixtures')
 FIXTURES = [
+    ('array_comment.hcl', 'array_comment.json', None),
     ('basic.hcl', 'basic.json', None),
     ('basic_squish.hcl', None, {'foo': 'bar', 'bar': '${file("bing/bong.txt")}', 'foo-bar':"baz"}),
     ('decode_policy.hcl', 'decode_policy.json', None),

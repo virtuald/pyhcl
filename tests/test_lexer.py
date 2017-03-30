@@ -47,7 +47,7 @@ LEX_FIXTURES = [
         [
             "IDENTIFIER", "EQUAL", "LEFTBRACKET",
             "NUMBER", "COMMA", "NUMBER", "COMMA", "STRING",
-            "COMMAEND", "RIGHTBRACKET", None,
+            "COMMA", "RIGHTBRACKET", None,
         ],
     ),
     (
@@ -348,14 +348,10 @@ def test_tokens(token, input_string):
         assert token == lex_tok.type
         assert lexer.token() is None
 
-# Testing COMMAEND, EPLUS, and EMINUS can't be done on their own since they
+# Testing EPLUS and EMINUS can't be done on their own since they
 # require positive lookbehinds and therefore the lexer will find at least one
 # other token
 COMPLEX_TOKEN_FIXTURES = [
-    # COMMAEND
-    (["COMMAEND", "RIGHTBRACKET"], ",]"),
-    (["COMMAEND", "RIGHTBRACKET"], ", ]"),
-
     # EPLUS
     (["FLOAT", "EPLUS"], "0.e"),
     (["FLOAT", "EPLUS"], "1.e+"),

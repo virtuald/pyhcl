@@ -170,7 +170,10 @@ class HclParser(object):
     
     
     def p_list_0(self, p):
-        "list : LEFTBRACKET listitems RIGHTBRACKET"
+        '''
+        list : LEFTBRACKET listitems RIGHTBRACKET
+             | LEFTBRACKET listitems COMMA RIGHTBRACKET
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = p[2]
@@ -193,13 +196,7 @@ class HclParser(object):
         if DEBUG:
             self.print_p(p)
         p[0] = p[1] + [p[3]]
-    
-    def p_listitems_2(self, p):
-        "listitems : listitems COMMAEND"
-        if DEBUG:
-            self.print_p(p)
-        p[0] = p[1]
-        
+
     def p_listitem(self, p):
         '''
         listitem : number
