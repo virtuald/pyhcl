@@ -148,20 +148,25 @@ class Lexer(object):
         _raise_error(t, "EOF before closing '${}' expression")
 
     def t_heredoc(self, t):
-        r'<<\S+(?=\n)'
+        r'<<\S+\r?\n'
         t.lexer.here_start = t.lexer.lexpos
-        t.lexer.here_identifier = t.value[2:]
+        if t.value.endswith('\r\n'):
+            t.lexer.newline_chars = 2
+        else:
+            t.lexer.newline_chars = 1
+        # Chop off the '<<' and newlines
+        t.lexer.here_identifier = t.value[2:-t.lexer.newline_chars]
+        # We consumed a newline in the regex so bump the counter
+        t.lexer.lineno += 1
         t.lexer.begin('heredoc')
 
     def t_heredoc_STRING(self, t):
-        r'^\S+$'
+        r'^\S+(?=\r?$)'
         if t.value == t.lexer.here_identifier:
-            # Need to subtract the identifier and \n from the lexpos to get the
+            # Need to subtract the identifier and newline characters to get the
             # endpos
-            endpos = t.lexer.lexpos - (1 + len(t.lexer.here_identifier))
-            # The startpos is one character after the here_start to account for
-            # the newline
-            t.value = t.lexer.lexdata[t.lexer.here_start + 1:endpos]
+            endpos = t.lexer.lexpos - (t.lexer.newline_chars + len(t.lexer.here_identifier))
+            t.value = t.lexer.lexdata[t.lexer.here_start:endpos]
             t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
             t.lexer.begin('INITIAL')
             return t

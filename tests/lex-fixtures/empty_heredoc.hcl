@@ -1,0 +1,2 @@
+empty = <<DOC
+DOC

@@ -69,6 +69,18 @@ LEX_FIXTURES = [
             "RIGHTBRACE", None,
         ],
     ),
+    (
+        "windows_heredoc.hcl",
+        [
+            "IDENTIFIER", "EQUAL", "STRING", None,
+        ],
+    ),
+    (
+        "empty_heredoc.hcl",
+        [
+            "IDENTIFIER", "EQUAL", "STRING", None,
+        ],
+    ),
 ]
 
 # The first value in the tuple can be either the file that will be read or just
