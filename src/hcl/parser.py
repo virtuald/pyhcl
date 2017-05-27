@@ -2,6 +2,7 @@
 from os.path import abspath, dirname, exists, join
 import sys
 
+from .compat import iteritems
 from .lexer import Lexer
 from ply import lex, yacc
 
@@ -20,14 +21,6 @@ else:
     import tempfile
     fobj = tempfile.NamedTemporaryFile()
     pickle_file = fobj.name
-
-
-if sys.version_info[0] < 3:
-    def iteritems(d):
-        return iter(d.iteritems())
-else:
-    def iteritems(d):
-        return iter(d.items())
 
 
 class HclParser(object):
