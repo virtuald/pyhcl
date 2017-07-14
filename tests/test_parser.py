@@ -52,6 +52,10 @@ PARSE_FIXTURES = [
         "types.hcl",
         False,
     ),
+    (
+        "structure_comma.hcl",
+        False,
+    ),
 ]
 
 @pytest.mark.parametrize("hcl_fname,invalid", PARSE_FIXTURES)
