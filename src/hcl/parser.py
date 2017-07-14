@@ -105,7 +105,12 @@ class HclParser(object):
         if DEBUG:
             self.print_p(p)
         p[0] = p[1] + [p[2]]
-    
+
+    def p_objectlist_2(self, p):
+        "objectlist : objectlist COMMA objectitem"
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] + [p[3]]
     
     def p_object_0(self, p):
         "object : LEFTBRACE objectlist RIGHTBRACE"
@@ -114,6 +119,12 @@ class HclParser(object):
         p[0] = self.objectlist_flat(p[2],False)
         
     def p_object_1(self, p):
+        "object : LEFTBRACE objectlist COMMA RIGHTBRACE"
+        if DEBUG:
+            self.print_p(p)
+        p[0] = self.objectlist_flat(p[2],False)
+
+    def p_object_2(self, p):
         "object : LEFTBRACE RIGHTBRACE"
         if DEBUG:
             self.print_p(p)
