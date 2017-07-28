@@ -51,6 +51,17 @@ LEX_FIXTURES = [
         ],
     ),
     (
+        "list_of_maps.hcl",
+        [
+            "IDENTIFIER", "EQUAL", "LEFTBRACKET",
+            "LEFTBRACE", "IDENTIFIER", "EQUAL", "STRING", "RIGHTBRACE",
+            "COMMA",
+            "LEFTBRACE", "IDENTIFIER", "EQUAL", "STRING", "COMMA",
+            "IDENTIFIER", "EQUAL", "STRING", "RIGHTBRACE", "COMMA",
+            "RIGHTBRACKET", None,
+        ],
+    ),
+    (
         "structure_basic.hcl",
         [
             "IDENTIFIER", "LEFTBRACE",
