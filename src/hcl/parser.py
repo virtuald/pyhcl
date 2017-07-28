@@ -211,6 +211,7 @@ class HclParser(object):
     def p_listitem(self, p):
         '''
         listitem : number
+                 | object
                  | STRING
         '''
         if DEBUG:

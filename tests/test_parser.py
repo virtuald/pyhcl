@@ -25,6 +25,10 @@ PARSE_FIXTURES = [
         False,
     ),
     (
+        "list_of_maps.hcl",
+        False,
+    ),
+    (
         "multiple.hcl",
         False,
     ),
@@ -46,7 +50,7 @@ PARSE_FIXTURES = [
     ),
     (
         "assign_deep.hcl",
-        True,
+        False,
     ),
     (
         "types.hcl",
