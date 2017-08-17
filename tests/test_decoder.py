@@ -34,6 +34,7 @@ FIXTURES = [
     #'structure_list_deep.json'
     ('structure_multi.hcl', 'structure_multi.json', None),
     ('structure_three_tiers.hcl', 'structure_three_tiers.json', None),
+    ('tab_heredoc.hcl', 'tab_heredoc.json', None),
     ('terraform_heroku.hcl', 'terraform_heroku.json', None),
     ('structure_list_deep.hcl','structure_list_deep.json', None)
 ]
@@ -43,17 +44,17 @@ FIXTURES = [
 
 @pytest.mark.parametrize("hcl_fname,json_fname,struct", FIXTURES)
 def test_decoder(hcl_fname, json_fname, struct):
-    
+
     with open(join(FIXTURE_DIR, hcl_fname), 'r') as fp:
         hcl_json = hcl.load(fp)
-    
+
     assert json_fname is not None or struct is not None
 
     if json_fname is not None:
         with open(join(FIXTURE_DIR, json_fname), 'r') as fp:
             good_json = json.load(fp)
-        
+
         assert hcl_json == good_json
-    
+
     if struct is not None:
         assert hcl_json == struct
