@@ -36,6 +36,7 @@ class Lexer(object):
         ('stringdollar', 'exclusive'),
         ('string', 'exclusive'),
         ('heredoc', 'exclusive'),
+        ('tabbedheredoc', 'exclusive'),
     )
 
     def t_BOOL(self, t):
@@ -147,29 +148,70 @@ class Lexer(object):
         t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos].count('\n')
         _raise_error(t, "EOF before closing '${}' expression")
 
-    def t_heredoc(self, t):
-        r'<<\S+\r?\n'
+    def _init_heredoc(self, t):
         t.lexer.here_start = t.lexer.lexpos
+
         if t.value.endswith('\r\n'):
             t.lexer.newline_chars = 2
         else:
             t.lexer.newline_chars = 1
-        # Chop off the '<<' and newlines
-        t.lexer.here_identifier = t.value[2:-t.lexer.newline_chars]
+
+        if t.lexer.is_tabbed:
+            # Chop '<<-'
+            chop = 3
+        else:
+            # Chop '<<'
+            chop = 2
+
+        t.lexer.here_identifier = t.value[chop:-t.lexer.newline_chars]
         # We consumed a newline in the regex so bump the counter
         t.lexer.lineno += 1
+
+    def t_tabbedheredoc(self, t):
+        r'<<-\S+\r?\n'
+        t.lexer.is_tabbed = True
+        self._init_heredoc(t)
+        t.lexer.begin('tabbedheredoc')
+
+    def t_heredoc(self, t):
+        r'<<\S+\r?\n'
+        t.lexer.is_tabbed = False
+        self._init_heredoc(t)
         t.lexer.begin('heredoc')
 
-    def t_heredoc_STRING(self, t):
-        r'^\S+(?=\r?$)'
-        if t.value == t.lexer.here_identifier:
-            # Need to subtract the identifier and newline characters to get the
-            # endpos
-            endpos = t.lexer.lexpos - (t.lexer.newline_chars + len(t.lexer.here_identifier))
-            t.value = t.lexer.lexdata[t.lexer.here_start:endpos]
+    def _end_heredoc(self, t):
+        if t.lexer.is_tabbed:
+            # Strip leading tabs
+            value = t.value.strip()
+        else:
+            value = t.value
+
+        if value == t.lexer.here_identifier:
+            # Need to subtract the current line and the newline characters from
+            # the previous line to get the endpos
+            endpos = t.lexer.lexpos - (t.lexer.newline_chars + len(t.value))
+
+            entire_string = t.lexer.lexdata[t.lexer.here_start:endpos]
+
+            if t.lexer.is_tabbed:
+                # Get rid of any initial tabs, and remove any tabs preceded by
+                # a new line
+                chopped_starting_tabs = re.sub('^\t*', '', entire_string)
+                t.value = re.sub('\n\t*', '\n', chopped_starting_tabs)
+            else:
+                t.value = entire_string
+
             t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
             t.lexer.begin('INITIAL')
             return t
+
+    def t_tabbedheredoc_STRING(self, t):
+        r'^\t*\S+(?=\r?$)'
+        return self._end_heredoc(t)
+
+    def t_heredoc_STRING(self, t):
+        r'^\S+(?=\r?$)'
+        return self._end_heredoc(t)
 
     def t_heredoc_ignoring(self, t):
         r'.+|\n'
@@ -178,6 +220,9 @@ class Lexer(object):
     def t_heredoc_eof(self, t):
         t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
         _raise_error(t, 'EOF before closing heredoc')
+
+    t_tabbedheredoc_ignoring = t_heredoc_ignoring
+    t_tabbedheredoc_eof = t_heredoc_eof
 
     t_EQUAL = r'='
     t_MINUS = r'-'
