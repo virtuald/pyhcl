@@ -4,6 +4,8 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
+  - "3.6"
 # command to install dependencies
 install:
   - "pip install ."
@@ -11,3 +13,10 @@ install:
 # command to run tests
 script:
   - tests/run_tests.sh
+# Deploy to pypi on tagged commit
+deploy:
+- provider: pypi
+  user: $PYPI_USERNAME
+  password: $PYPI_PASSWORD
+  on:
+    tags: true
