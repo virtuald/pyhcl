@@ -187,30 +187,37 @@ class Lexer(object):
             value = t.value
 
         if value == t.lexer.here_identifier:
-            # Need to subtract the current line and the newline characters from
+            # Handle case where identifier is on a line of its own. Need to
+            # subtract the current line and the newline characters from
             # the previous line to get the endpos
             endpos = t.lexer.lexpos - (t.lexer.newline_chars + len(t.value))
+        elif value.endswith(t.lexer.here_identifier):
+            # Handle case where identifier is at the end of the line. Need to
+            # subtract the identifier from to get the endpos
+            endpos = t.lexer.lexpos - len(t.lexer.here_identifier)
+        else:
+            return
 
-            entire_string = t.lexer.lexdata[t.lexer.here_start:endpos]
+        entire_string = t.lexer.lexdata[t.lexer.here_start:endpos]
 
-            if t.lexer.is_tabbed:
-                # Get rid of any initial tabs, and remove any tabs preceded by
-                # a new line
-                chopped_starting_tabs = re.sub('^\t*', '', entire_string)
-                t.value = re.sub('\n\t*', '\n', chopped_starting_tabs)
-            else:
-                t.value = entire_string
+        if t.lexer.is_tabbed:
+            # Get rid of any initial tabs, and remove any tabs preceded by
+            # a new line
+            chopped_starting_tabs = re.sub('^\t*', '', entire_string)
+            t.value = re.sub('\n\t*', '\n', chopped_starting_tabs)
+        else:
+            t.value = entire_string
 
-            t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
-            t.lexer.begin('INITIAL')
-            return t
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
+        t.lexer.begin('INITIAL')
+        return t
 
     def t_tabbedheredoc_STRING(self, t):
-        r'^\t*\S+(?=\r?$)'
+        r'^\t*.+?(?=\r?$)'
         return self._end_heredoc(t)
 
     def t_heredoc_STRING(self, t):
-        r'^\S+(?=\r?$)'
+        r'^.+?(?=\r?$)'
         return self._end_heredoc(t)
 
     def t_heredoc_ignoring(self, t):

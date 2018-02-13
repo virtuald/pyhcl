@@ -92,6 +92,12 @@ LEX_FIXTURES = [
             "IDENTIFIER", "EQUAL", "STRING", None,
         ],
     ),
+    (
+        "heredoc_terminator_same_line.hcl",
+        [
+            "IDENTIFIER", "EQUAL", "STRING", None,
+        ],
+    ),
 ]
 
 # The first value in the tuple can be either the file that will be read or just
@@ -154,24 +160,24 @@ LEX_ERROR_FIXTURES = [
 
 @pytest.mark.parametrize("hcl_fname,tokens", LEX_FIXTURES)
 def test_lexer(hcl_fname, tokens):
-    
+
     with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
         input = fp.read()
-    
+
     print(input)
-    
+
     lexer = hcl.lexer.Lexer()
     lexer.input(input)
 
     for tok in tokens:
         lex_tok = lexer.token()
-            
+
         if lex_tok is None:
             assert tok is None
         else:
-            assert tok == lex_tok.type 
+            assert tok == lex_tok.type
         print(lex_tok)
-            
+
     assert lexer.token() is None
 
 @pytest.mark.parametrize("hcl_fname,tokens,error_loc", LEX_ERROR_FIXTURES)
