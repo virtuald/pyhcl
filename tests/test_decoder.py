@@ -36,7 +36,8 @@ FIXTURES = [
     ('structure_three_tiers.hcl', 'structure_three_tiers.json', None),
     ('tab_heredoc.hcl', 'tab_heredoc.json', None),
     ('terraform_heroku.hcl', 'terraform_heroku.json', None),
-    ('structure_list_deep.hcl','structure_list_deep.json', None)
+    ('structure_list_deep.hcl','structure_list_deep.json', None),
+    ('heredoc_terminator_same_line.hcl','heredoc_terminator_same_line.json', None),
 ]
 
 

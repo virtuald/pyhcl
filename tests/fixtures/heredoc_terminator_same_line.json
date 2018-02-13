@@ -1,0 +1,4 @@
+{
+    "foo": "\nbar\nbaz",
+    "bar": "foo\nbaz"
+}
