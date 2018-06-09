@@ -5,18 +5,22 @@ from .parser import HclParser
 import sys
 
 if sys.version_info[0] < 3:
+
     def u(s):
         if isinstance(s, unicode):
             return s
         else:
             return unicode(s, 'utf-8')
+
+
 else:
+
     def u(s):
         if isinstance(s, bytes):
             return s.decode('utf-8')
         else:
             return s
-    
+
 
 def isHcl(s):
     '''
@@ -30,12 +34,12 @@ def isHcl(s):
     for c in s:
         if c.isspace():
             continue
-        
+
         if c == '{':
             return False
         else:
             return True
-        
+
     raise ValueError("No HCL object could be decoded")
 
 
@@ -50,6 +54,7 @@ def load(fp):
     '''
     return loads(fp.read())
 
+
 def loads(s):
     '''
         Deserializes a string and converts it to a dictionary. The contents
@@ -62,9 +67,8 @@ def loads(s):
         return HclParser().parse(s)
     else:
         return json.loads(s)
-    
+
 
 def dumps(*args, **kwargs):
     '''Turns a dictionary into JSON, passthru to json.dumps'''
     return json.dumps(*args, **kwargs)
-

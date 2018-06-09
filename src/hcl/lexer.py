@@ -7,6 +7,7 @@ if sys.version_info < (3,):
 else:
     text_type = str
 
+
 def _raise_error(t, message=None):
     lexpos = t.lexer.lexpos
     lexdata = t.lexer.lexdata
@@ -14,12 +15,16 @@ def _raise_error(t, message=None):
     column = _find_column(lexdata, t)
     if message is None:
         message = "Illegal character '%s'" % lexdata[lexpos]
-    raise ValueError("Line %d, column %d, index %d: %s" % (lineno, column, lexpos, message))
+    raise ValueError(
+        "Line %d, column %d, index %d: %s" % (lineno, column, lexpos, message)
+    )
+
 
 def _find_column(input, token):
     last_cr = input.rfind('\n', 0, token.lexpos)
     column = (token.lexpos - last_cr) - 1
     return column
+
 
 class Lexer(object):
 
@@ -27,9 +32,18 @@ class Lexer(object):
         'BOOL',
         'FLOAT',
         'NUMBER',
-        'COMMA', 'IDENTIFIER', 'EQUAL', 'STRING', 'MINUS',
-        'LEFTBRACE', 'RIGHTBRACE', 'LEFTBRACKET', 'RIGHTBRACKET', 'PERIOD',
-        'EPLUS', 'EMINUS',
+        'COMMA',
+        'IDENTIFIER',
+        'EQUAL',
+        'STRING',
+        'MINUS',
+        'LEFTBRACE',
+        'RIGHTBRACE',
+        'LEFTBRACKET',
+        'RIGHTBRACKET',
+        'PERIOD',
+        'EPLUS',
+        'EMINUS',
     )
 
     states = (
@@ -41,7 +55,7 @@ class Lexer(object):
 
     def t_BOOL(self, t):
         r'(true)|(false)'
-        t.value = (t.value == 'true')
+        t.value = t.value == 'true'
         return t
 
     def t_EMINUS(self, t):
@@ -100,7 +114,9 @@ class Lexer(object):
         # If a quote or backslash is escaped, build up the string by ignoring
         # the escape character. Should this be done for other characters?
         r'(?<=\\)(\"|\\)'
-        t.lexer.string_value += t.lexer.lexdata[t.lexer.rel_pos:t.lexer.lexpos - 2] + t.value
+        t.lexer.string_value += (
+            t.lexer.lexdata[t.lexer.rel_pos : t.lexer.lexpos - 2] + t.value
+        )
         t.lexer.rel_pos = t.lexer.lexpos
         pass
 
@@ -118,13 +134,19 @@ class Lexer(object):
     def t_string_STRING(self, t):
         # End of the string
         r'\"'
-        t.value = t.lexer.string_value + t.lexer.lexdata[t.lexer.rel_pos:t.lexer.lexpos - 1]
-        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos - 1].count('\n')
+        t.value = (
+            t.lexer.string_value + t.lexer.lexdata[t.lexer.rel_pos : t.lexer.lexpos - 1]
+        )
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start : t.lexer.lexpos - 1].count(
+            '\n'
+        )
         t.lexer.begin('INITIAL')
         return t
 
     def t_string_eof(self, t):
-        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos].count('\n')
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start : t.lexer.lexpos].count(
+            '\n'
+        )
         _raise_error(t, 'EOF before closing string quote')
 
     def t_stringdollar_dontcare(self, t):
@@ -145,7 +167,9 @@ class Lexer(object):
             t.lexer.begin('string')
 
     def t_stringdollar_eof(self, t):
-        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start:t.lexer.lexpos].count('\n')
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.abs_start : t.lexer.lexpos].count(
+            '\n'
+        )
         _raise_error(t, "EOF before closing '${}' expression")
 
     def _init_heredoc(self, t):
@@ -163,7 +187,7 @@ class Lexer(object):
             # Chop '<<'
             chop = 2
 
-        t.lexer.here_identifier = t.value[chop:-t.lexer.newline_chars]
+        t.lexer.here_identifier = t.value[chop : -t.lexer.newline_chars]
         # We consumed a newline in the regex so bump the counter
         t.lexer.lineno += 1
 
@@ -198,7 +222,7 @@ class Lexer(object):
         else:
             return
 
-        entire_string = t.lexer.lexdata[t.lexer.here_start:endpos]
+        entire_string = t.lexer.lexdata[t.lexer.here_start : endpos]
 
         if t.lexer.is_tabbed:
             # Get rid of any initial tabs, and remove any tabs preceded by
@@ -208,7 +232,9 @@ class Lexer(object):
         else:
             t.value = entire_string
 
-        t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start : t.lexer.lexpos].count(
+            '\n'
+        )
         t.lexer.begin('INITIAL')
         return t
 
@@ -225,7 +251,9 @@ class Lexer(object):
         pass
 
     def t_heredoc_eof(self, t):
-        t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start:t.lexer.lexpos].count('\n')
+        t.lexer.lineno += t.lexer.lexdata[t.lexer.here_start : t.lexer.lexpos].count(
+            '\n'
+        )
         _raise_error(t, 'EOF before closing heredoc')
 
     t_tabbedheredoc_ignoring = t_heredoc_ignoring
@@ -273,7 +301,12 @@ class Lexer(object):
             _raise_error(t)
 
     def __init__(self):
-        self.lex = lex.lex(module=self, debug=False, reflags=(re.UNICODE | re.MULTILINE), errorlog=lex.NullLogger())
+        self.lex = lex.lex(
+            module=self,
+            debug=False,
+            reflags=(re.UNICODE | re.MULTILINE),
+            errorlog=lex.NullLogger(),
+        )
 
     def input(self, s):
         return self.lex.input(s)
