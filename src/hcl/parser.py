@@ -7,7 +7,7 @@ from ply import lex, yacc
 
 import inspect
 
-DEBUG = False
+DEBUG = True
 
 # When using something like pyinstaller, the __file__ attribute isn't actually
 # set correctly, so the parse file isn't able to be saved anywhere sensible.
@@ -66,13 +66,13 @@ class HclParser(object):
     def objectlist_flat(self, lt, replace):
         '''
             Similar to the dict constructor, but handles dups
-            
+
             HCL is unclear on what one should do when duplicate keys are
             encountered. These comments aren't clear either:
-            
+
             from decoder.go: if we're at the root or we're directly within
                              a list, decode into dicts, otherwise lists
-                
+
             from object.go: there's a flattened list structure
         '''
         d = {}
@@ -106,7 +106,12 @@ class HclParser(object):
         "top : objectlist"
         if DEBUG:
             self.print_p(p)
-        p[0] = self.objectlist_flat(p[1], True)
+        withoutIt = filter(lambda x: x[0] != "provider", p[1])
+        withIt = filter(lambda x: x[0] == "provider", p[1])
+        unique = self.objectlist_flat(withoutIt, True)
+        dup = self.objectlist_flat(withIt, False)
+        dup.update(unique)
+        p[0] = dup
 
     def p_objectlist_0(self, p):
         "objectlist : objectitem"
