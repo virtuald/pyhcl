@@ -59,7 +59,7 @@ class HclParser(object):
         'EPLUS',
         'EMINUS',
     )
-
+    allowedDups = set(["provider"])
     #
     # Yacc parser section
     #
@@ -106,8 +106,8 @@ class HclParser(object):
         "top : objectlist"
         if DEBUG:
             self.print_p(p)
-        withoutIt = filter(lambda x: x[0] != "provider", p[1])
-        withIt = filter(lambda x: x[0] == "provider", p[1])
+        withoutIt = filter(lambda x: x[0] not in self.allowedDups, p[1])
+        withIt = filter(lambda x: x[0] in self.allowedDups, p[1])
         unique = self.objectlist_flat(withoutIt, True)
         dup = self.objectlist_flat(withIt, False)
         dup.update(unique)
