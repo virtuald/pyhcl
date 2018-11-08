@@ -7,7 +7,7 @@ from ply import lex, yacc
 
 import inspect
 
-DEBUG = True
+DEBUG = False
 
 # When using something like pyinstaller, the __file__ attribute isn't actually
 # set correctly, so the parse file isn't able to be saved anywhere sensible.
