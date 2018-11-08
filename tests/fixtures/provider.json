@@ -1,0 +1,15 @@
+{
+  "provider": {
+    "aws": [
+      {
+        "region": "${var.active_region-2}",
+        "version": "~> 1.28.0"
+      },
+      {
+        "alias": "dr",
+        "region": "${var.active_region-2}",
+        "version": "~> 1.28.0"
+      }
+    ]
+  }
+}
