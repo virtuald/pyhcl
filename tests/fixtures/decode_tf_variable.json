@@ -1,14 +1,23 @@
 {
-    "variable": {
-        "foo": {
-            "default": "bar",
-            "description": "bar"
+    "variable": [
+        {
+            "foo": [
+                {
+                    "default": "bar",
+                    "description": "bar"
+                }
+            ]
         },
-
-        "amis": {
-            "default": {
-                "east": "foo"
-            }
+        {
+            "amis": [
+                {
+                    "default": [
+                        {
+                            "east": "foo"
+                        }
+                    ]
+                }
+            ]
         }
-    }
+    ]
 }

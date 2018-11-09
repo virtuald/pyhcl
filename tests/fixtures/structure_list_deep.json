@@ -1,19 +1,22 @@
 {
-    "bar": {
-        "foo": {
-            "name": "terraform_example",
-            "ingress": [
+    "bar": [
+        {
+            "foo": [
                 {
-                    "from_port": 22
-                },
-                {
-                    "from_port": 80
-                },
-                {
-                    "from_port": 51
+                    "ingress": [
+                        {
+                            "from_port": 22
+                        },
+                        {
+                            "from_port": 80
+                        },
+                        {
+                            "from_port": 51
+                        }
+                    ],
+                    "name": "terraform_example"
                 }
             ]
         }
-    }
+    ]
 }
-

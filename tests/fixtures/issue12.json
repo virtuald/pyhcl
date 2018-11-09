@@ -1,15 +1,28 @@
 {
-    "resource": {
-        "aws_db_instance": {
-            "mysqldb": {
-                "allocated_storage": 100,
-                "identifier": "${var.environment}-mysqldb"
-            },
-            "mysqldb-readonly": {
-                "allocated_storage": 100,
-                "identifier": "${var.environment}-mysqldb-readonly"
-            }
+    "resource": [
+        {
+            "aws_db_instance": [
+                {
+                    "mysqldb": [
+                        {
+                            "allocated_storage": 100,
+                            "identifier": "${var.environment}-mysqldb"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "aws_db_instance": [
+                {
+                    "mysqldb-readonly": [
+                        {
+                            "allocated_storage": 100,
+                            "identifier": "${var.environment}-mysqldb-readonly"
+                        }
+                    ]
+                }
+            ]
         }
-    }
+    ]
 }
-
