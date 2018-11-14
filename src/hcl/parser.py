@@ -223,6 +223,7 @@ class HclParser(object):
         '''
         listitem : number
                  | object
+                 | list
                  | STRING
         '''
         if DEBUG:
