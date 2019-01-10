@@ -99,5 +99,5 @@ Dustin Spicuzza (dustin@virtualroadside.com)
 
 Note: This project is not associated with Hashicorp
 
-.. |Build Status| image:: https://travis-ci.org/virtuald/pyhcl.svg
+.. |Build Status| image:: https://travis-ci.org/virtuald/pyhcl.svg?branch=master
    :target: https://travis-ci.org/virtuald/pyhcl
