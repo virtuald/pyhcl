@@ -1,15 +1,24 @@
 language: python
-sudo: false
+sudo: required
+dist: xenial
+
+env:
+- PLY=ply==3.8
+- PLY=ply
+
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
+
 # command to install dependencies
 install:
+  - "pip install $PLY"
   - "pip install ."
   - "pip install -r testing-requirements.txt"
+  - "pip list"
 # command to run tests
 script:
   - tests/run_tests.sh

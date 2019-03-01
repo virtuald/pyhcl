@@ -9,8 +9,8 @@ implementation aims to be compatible with the original golang version of
 the parser.
 
 The grammar and many of the tests/fixtures were copied/ported from the
-golang parser into pyhcl. All releases are tested with Python 2.7, 3.2, 3.3,
-and 3.4. 
+golang parser into pyhcl. All releases are tested with a variety of 
+python versions from Python 2.7 onward.
 
 Installation
 ============
