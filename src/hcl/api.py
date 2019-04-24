@@ -42,30 +42,33 @@ def isHcl(s):
     raise ValueError("No HCL object could be decoded")
 
 
-def load(fp):
+def load(fp, object_pairs_hook=None):
     '''
         Deserializes a file-pointer like object into a python dictionary.
         The contents of the file must either be JSON or HCL.
         
         :param fp: An object that has a read() function
-        
+        :param object_pairs_hook: is an optional function that behaves just like the json.load parameter does but only supports OrderedDict
         :returns: Dictionary
     '''
-    return loads(fp.read())
+    return loads(fp.read(), object_pairs_hook=object_pairs_hook)
 
 
-def loads(s):
+def loads(s, object_pairs_hook=None):
     '''
         Deserializes a string and converts it to a dictionary. The contents
         of the string must either be JSON or HCL.
-        
+
+        :param object_pairs_hook: is an optional function that behaves just like the json.load parameter does but only supports OrderedDict
+
         :returns: Dictionary 
     '''
     s = u(s)
     if isHcl(s):
-        return HclParser().parse(s)
+        hcl_out = HclParser(object_pairs_hook=object_pairs_hook)
+        return hcl_out.parse(s)
     else:
-        return json.loads(s)
+        return json.loads(s, object_pairs_hook=object_pairs_hook)
 
 
 def dumps(*args, **kwargs):
