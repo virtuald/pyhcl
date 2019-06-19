@@ -36,7 +36,12 @@ def _pre_install():
 
 class build_py(_build_py):
     def run(self):
-        self.execute(_pre_install, (), msg="Generating parse table...")
+        try:
+            import ply
+        except ImportError:
+            print("skipping parse table")
+        else:
+            self.execute(_pre_install, (), msg="generating parse table...")
         _build_py.run(self)
 
 
