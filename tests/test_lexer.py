@@ -106,7 +106,7 @@ LEX_ERROR_FIXTURES = [
     (
         "old.hcl",
         [
-            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", Error
+            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", "COLON", "STRING"
         ],
         "Line 2, column 15, index 27: Illegal character ':'"
     ),
@@ -129,7 +129,7 @@ LEX_ERROR_FIXTURES = [
         "a = <HERE\n"
         "foobar\n"
         "HERE",
-        ["IDENTIFIER", "EQUAL", Error],
+        ["IDENTIFIER", "EQUAL", "LT", "IDENTIFIER"],
         "Line 1, column 4, index 4: Heredoc must start with '<<', got '<H'"
     ),
     (

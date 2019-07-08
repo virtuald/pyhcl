@@ -57,6 +57,16 @@ class HclParser(object):
         'PERIOD',
         'EPLUS',
         'EMINUS',
+        'LEFTPAREN',
+        'RIGHTPAREN',
+        'QMARK',
+        'COLON',
+        'GT',
+        'LT',
+        'EQ',
+        'NE',
+        'LE',
+        'GE',
     )
 
     #
@@ -100,7 +110,7 @@ class HclParser(object):
                     d[k] = v
 
         return d
-
+    
     def p_top(self, p):
         "top : objectlist"
         if DEBUG:
@@ -157,6 +167,7 @@ class HclParser(object):
         objectitem : objectkey EQUAL number
                    | objectkey EQUAL BOOL
                    | objectkey EQUAL STRING
+                   | objectkey EQUAL IDENTIFIER
                    | objectkey EQUAL object
                    | objectkey EQUAL list
         '''
@@ -170,31 +181,78 @@ class HclParser(object):
             self.print_p(p)
         p[0] = p[1]
 
-    def p_block_0(self, p):
-        "block : blockId object"
-        if DEBUG:
-            self.print_p(p)
-        p[0] = (p[1], p[2])
-
-    def p_block_1(self, p):
-        "block : blockId block"
-        if DEBUG:
-            self.print_p(p)
-        p[0] = (p[1], {p[2][0]: p[2][1]})
-
-    def p_blockId(self, p):
+    def p_objectitem_2(self, p):
         '''
-        blockId : IDENTIFIER
-                | STRING
+        objectitem : objectkey EQUAL IDENTIFIER LEFTBRACKET IDENTIFIER RIGHTBRACKET
+        '''
+        if DEBUG:
+            self.print_p(p)
+
+        p[0] = (p[1], p[3] + p[4] + p[5] + p[6])
+
+    def p_objectitem_3(self, p):
+        '''
+        objectitem : objectkey EQUAL IDENTIFIER list
+        '''
+        if DEBUG:
+            self.print_p(p)
+
+        p[4].insert(0, p[3])
+        p[0] = (p[1], p[4])
+
+    def p_objectitem_4(self, p):
+        '''
+        objectitem : objectkey EQUAL objectkey QMARK objectkey COLON objectkey
+                   | objectkey EQUAL objectkey QMARK objectkey COLON number
+                   | objectkey EQUAL objectkey QMARK number COLON objectkey
+                   | objectkey EQUAL objectkey QMARK number COLON number
+                   | objectkey EQUAL booleanexp QMARK objectkey COLON objectkey
+                   | objectkey EQUAL booleanexp QMARK objectkey COLON number
+                   | objectkey EQUAL booleanexp QMARK number COLON objectkey
+                   | objectkey EQUAL booleanexp QMARK number COLON number
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = (p[1], p[3] + p[4] + str(p[5]) + p[6] + str(p[7]))
+
+    def p_operator_0(self, p):
+        '''
+        operator : EQ
+                 | NE
+                 | LT
+                 | GT
+                 | LE
+                 | GE
         '''
         if DEBUG:
             self.print_p(p)
         p[0] = p[1]
 
+    def p_booleanexp_0(self, p):
+        "booleanexp : objectkey operator objectkey"
+        "booleanexp : objectkey operator number"
+        "booleanexp : number operator objectkey"
+        if DEBUG:
+            self.print_p(p)
+        p[0] = str(p[1]) + p[2] + str(p[3])
+
+    def p_block_0(self, p):
+        "block : objectkey object"
+        if DEBUG:
+            self.print_p(p)
+        p[0] = (p[1], p[2])
+
+    def p_block_1(self, p):
+        "block : objectkey block"
+        if DEBUG:
+            self.print_p(p)
+        p[0] = (p[1], {p[2][0]: p[2][1]})
+
     def p_list_0(self, p):
         '''
         list : LEFTBRACKET listitems RIGHTBRACKET
              | LEFTBRACKET listitems COMMA RIGHTBRACKET
+             | LEFTPAREN listitems RIGHTPAREN
         '''
         if DEBUG:
             self.print_p(p)
@@ -207,26 +265,61 @@ class HclParser(object):
         p[0] = []
 
     def p_listitems_0(self, p):
-        "listitems : listitem"
+        '''
+        listitems : listitem
+                  | object COMMA
+                  | objectkey COMMA
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = [p[1]]
 
     def p_listitems_1(self, p):
-        "listitems : listitems COMMA listitem"
+        '''
+        listitems : listitems COMMA listitem
+                  | listitems COMMA objectkey
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = p[1] + [p[3]]
 
-    def p_listitem(self, p):
+    def p_listitems_2(self, p):
+        '''
+        listitems : object COMMA object
+                  | object COMMA objectkey
+                  | objectkey COMMA objectkey
+                  | objectkey COMMA object
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = [p[1], p[3]]
+
+    def p_listitems_3(self, p):
+        '''
+        listitems : objectkey list
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[2].insert(0, p[1])
+        p[0] = p[2]
+
+    def p_listitem_0(self, p):
         '''
         listitem : number
                  | object
-                 | STRING
+                 | objectkey
         '''
         if DEBUG:
             self.print_p(p)
         p[0] = p[1]
+
+    def p_listitem_1(self, p):
+        '''
+        listitem : objectkey LEFTBRACKET objectkey RIGHTBRACKET
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = (p[1] + p[2] + p[3] + p[4])
 
     def p_number_0(self, p):
         "number : int"
