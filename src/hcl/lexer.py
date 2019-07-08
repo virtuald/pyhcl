@@ -45,6 +45,16 @@ class Lexer(object):
         'PERIOD',
         'EPLUS',
         'EMINUS',
+        'LEFTPAREN',
+        'RIGHTPAREN',
+        'QMARK',
+        'COLON',
+        'GT',
+        'LT',
+        'EQ',
+        'NE',
+        'LE',
+        'GE',
     )
 
     states = (
@@ -90,6 +100,38 @@ class Lexer(object):
 
     def t_COMMA(self, t):
         r','
+        return t
+
+    def t_QMARK(self, t):
+        r'\?'
+        return t
+
+    def t_COLON(self, t):
+        r':'
+        return t
+
+    def t_GT(self, t):
+        r'>'
+        return t
+
+    def t_LT(self, t):
+        r'<[^<]'
+        return t
+
+    def t_EQ(self, t):
+        r'=='
+        return t
+
+    def t_NE(self, t):
+        r'!='
+        return t
+
+    def t_LE(self, t):
+        r'<='
+        return t
+
+    def t_GE(self, t):
+        r'>='
         return t
 
     def t_IDENTIFIER(self, t):
@@ -267,6 +309,8 @@ class Lexer(object):
     t_RIGHTBRACE = r'\}'
     t_LEFTBRACKET = r'\['
     t_RIGHTBRACKET = r'\]'
+    t_LEFTPAREN = r'\('
+    t_RIGHTPAREN = r'\)'
 
     def t_COMMENT(self, t):
         r'(\#|(//)).*'
