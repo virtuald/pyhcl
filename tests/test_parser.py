@@ -14,7 +14,7 @@ PARSE_FIXTURE_DIR = join(dirname(__file__), 'lex-fixtures')
 PARSE_FIXTURES = [
     (
         "assign_colon.hcl",
-        True,
+        False,
     ),
     (
         "comment.hcl",
@@ -58,6 +58,10 @@ PARSE_FIXTURES = [
     ),
     (
         "structure_comma.hcl",
+        False,
+    ),
+    (
+        "terraform0.12syntax.hcl",
         False,
     ),
 ]

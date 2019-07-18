@@ -48,6 +48,7 @@ class Lexer(object):
         'RIGHTPAREN',
         'QMARK',
         'COLON',
+        'ASTERISK_PERIOD',
         'GT',
         'LT',
         'EQ',
@@ -73,7 +74,7 @@ class Lexer(object):
         return t
 
     def t_EPLUS(self, t):
-        r'(?<=\d|\.)[eE]\+?'
+        r'(?<=\d)[eE]\+?|(?<=\d\.)[eE]\+?'
         return t
 
     def t_FLOAT(self, t):
@@ -109,12 +110,16 @@ class Lexer(object):
         r':'
         return t
 
+    def t_ASTERISK_PERIOD(self, t):
+        r'\*\.'
+        return t
+
     def t_GT(self, t):
-        r'>'
+        r'(?<!>)>(?!>|=)'
         return t
 
     def t_LT(self, t):
-        r'<[^<]'
+        r'(?<!<)<(?!<|=)'
         return t
 
     def t_EQ(self, t):
@@ -301,7 +306,7 @@ class Lexer(object):
     t_tabbedheredoc_ignoring = t_heredoc_ignoring
     t_tabbedheredoc_eof = t_heredoc_eof
 
-    t_EQUAL = r'='
+    t_EQUAL = r'(?<!=)=(?!=)'
     t_MINUS = r'-'
 
     t_LEFTBRACE = r'\{'

@@ -233,14 +233,25 @@ TOKEN_FIXTURES = [
     (None, "/*" + f100 + "*/"),
 
     # Operators
+    ("LEFTPAREN", "("),
     ("LEFTBRACKET", "["),
     ("LEFTBRACE", "{"),
     ("COMMA", ","),
     ("PERIOD", "."),
+    ("RIGHTPAREN", ")"),
     ("RIGHTBRACKET", "]"),
     ("RIGHTBRACE", "}"),
     ("EQUAL", "="),
     ("MINUS", "-"),
+    ("QMARK", "?"),
+    ("COLON", ":"),
+    ("GT", ">"),
+    ("LT", "<"),
+    ("EQ", "=="),
+    ("NE", "!="),
+    ("LE", "<="),
+    ("GE", ">="),
+    ("ASTERISK_PERIOD", "*."),
 
     # Bools
     ("BOOL", "true"),
@@ -382,6 +393,7 @@ def test_tokens(token, input_string):
 # other token
 COMPLEX_TOKEN_FIXTURES = [
     # EPLUS
+    (["IDENTIFIER", "EQUAL", "LEFTBRACKET", "IDENTIFIER", "LEFTBRACKET", "NUMBER", "RIGHTBRACKET", "PERIOD", "IDENTIFIER", "RIGHTBRACKET", ], "records = [aws_elasticsearch_domain.elasticsearch[0].endpoint]"),
     (["FLOAT", "EPLUS"], "0.e"),
     (["FLOAT", "EPLUS"], "1.e+"),
     (["NUMBER", "EPLUS"], "0e"),
