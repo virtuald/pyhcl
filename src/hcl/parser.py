@@ -61,6 +61,7 @@ class HclParser(object):
         'RIGHTPAREN',
         'QMARK',
         'COLON',
+        'ASTERISK_PERIOD',
         'GT',
         'LT',
         'EQ',
@@ -110,7 +111,7 @@ class HclParser(object):
                     d[k] = v
 
         return d
-    
+
     def p_top(self, p):
         "top : objectlist"
         if DEBUG:
@@ -162,6 +163,21 @@ class HclParser(object):
             self.print_p(p)
         p[0] = p[1]
 
+    def p_objectbrackets_0(self, p):
+        "objectbrackets : IDENTIFIER LEFTBRACKET objectkey RIGHTBRACKET"
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] + p[2] + p[3] + p[4]
+
+    def p_objectbrackets_1(self, p):
+        '''
+        objectbrackets : IDENTIFIER LEFTBRACKET objectkey RIGHTBRACKET PERIOD IDENTIFIER
+                       | IDENTIFIER LEFTBRACKET NUMBER RIGHTBRACKET PERIOD IDENTIFIER
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] + p[2] + str(p[3]) + p[4] + p[5] + p[6]
+
     def p_objectitem_0(self, p):
         '''
         objectitem : objectkey EQUAL number
@@ -170,6 +186,15 @@ class HclParser(object):
                    | objectkey EQUAL IDENTIFIER
                    | objectkey EQUAL object
                    | objectkey EQUAL list
+                   | objectkey EQUAL objectbrackets
+                   | objectkey EQUAL function
+                   | objectkey COLON number
+                   | objectkey COLON BOOL
+                   | objectkey COLON STRING
+                   | objectkey COLON IDENTIFIER
+                   | objectkey COLON object
+                   | objectkey COLON list
+                   | objectkey COLON objectbrackets
         '''
         if DEBUG:
             self.print_p(p)
@@ -183,33 +208,24 @@ class HclParser(object):
 
     def p_objectitem_2(self, p):
         '''
-        objectitem : objectkey EQUAL IDENTIFIER LEFTBRACKET IDENTIFIER RIGHTBRACKET
-        '''
-        if DEBUG:
-            self.print_p(p)
-
-        p[0] = (p[1], p[3] + p[4] + p[5] + p[6])
-
-    def p_objectitem_3(self, p):
-        '''
-        objectitem : objectkey EQUAL IDENTIFIER list
-        '''
-        if DEBUG:
-            self.print_p(p)
-
-        p[4].insert(0, p[3])
-        p[0] = (p[1], p[4])
-
-    def p_objectitem_4(self, p):
-        '''
         objectitem : objectkey EQUAL objectkey QMARK objectkey COLON objectkey
                    | objectkey EQUAL objectkey QMARK objectkey COLON number
+                   | objectkey EQUAL objectkey QMARK objectkey COLON BOOL
+                   | objectkey EQUAL objectkey QMARK BOOL COLON objectkey
                    | objectkey EQUAL objectkey QMARK number COLON objectkey
                    | objectkey EQUAL objectkey QMARK number COLON number
+                   | objectkey EQUAL objectkey QMARK number COLON BOOL
+                   | objectkey EQUAL objectkey QMARK BOOL COLON number
+                   | objectkey EQUAL objectkey QMARK BOOL COLON BOOL
                    | objectkey EQUAL booleanexp QMARK objectkey COLON objectkey
                    | objectkey EQUAL booleanexp QMARK objectkey COLON number
+                   | objectkey EQUAL booleanexp QMARK objectkey COLON BOOL
+                   | objectkey EQUAL booleanexp QMARK BOOL COLON objectkey
                    | objectkey EQUAL booleanexp QMARK number COLON objectkey
                    | objectkey EQUAL booleanexp QMARK number COLON number
+                   | objectkey EQUAL booleanexp QMARK number COLON BOOL
+                   | objectkey EQUAL booleanexp QMARK BOOL COLON number
+                   | objectkey EQUAL booleanexp QMARK BOOL COLON BOOL
         '''
         if DEBUG:
             self.print_p(p)
@@ -229,9 +245,11 @@ class HclParser(object):
         p[0] = p[1]
 
     def p_booleanexp_0(self, p):
-        "booleanexp : objectkey operator objectkey"
-        "booleanexp : objectkey operator number"
-        "booleanexp : number operator objectkey"
+        '''
+        booleanexp : objectkey operator objectkey
+                   | objectkey operator number
+                   | number operator objectkey
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = str(p[1]) + p[2] + str(p[3])
@@ -253,20 +271,42 @@ class HclParser(object):
         list : LEFTBRACKET listitems RIGHTBRACKET
              | LEFTBRACKET listitems COMMA RIGHTBRACKET
              | LEFTPAREN listitems RIGHTPAREN
+             | LEFTPAREN listitems COMMA RIGHTPAREN
         '''
         if DEBUG:
             self.print_p(p)
         p[0] = p[2]
 
     def p_list_1(self, p):
-        "list : LEFTBRACKET RIGHTBRACKET"
+        '''
+        list : LEFTBRACKET RIGHTBRACKET
+             | LEFTPAREN RIGHTPAREN
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = []
 
+    def p_list_2(self, p):
+        '''
+        list : LEFTPAREN LEFTBRACKET listitems RIGHTBRACKET PERIOD PERIOD PERIOD RIGHTPAREN
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8]
+
+    def p_function_0(self, p):
+        '''
+        function : IDENTIFIER list
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[2].insert(0, p[1])
+        p[0] = p[2]
+
     def p_listitems_0(self, p):
         '''
         listitems : listitem
+                  | function
                   | object COMMA
                   | objectkey COMMA
         '''
@@ -277,6 +317,7 @@ class HclParser(object):
     def p_listitems_1(self, p):
         '''
         listitems : listitems COMMA listitem
+                  | listitems COMMA function
                   | listitems COMMA objectkey
         '''
         if DEBUG:
@@ -289,6 +330,8 @@ class HclParser(object):
                   | object COMMA objectkey
                   | objectkey COMMA objectkey
                   | objectkey COMMA object
+                  | objectkey COMMA list
+                  | objectkey COMMA IDENTIFIER ASTERISK_PERIOD IDENTIFIER
         '''
         if DEBUG:
             self.print_p(p)
@@ -308,6 +351,7 @@ class HclParser(object):
         listitem : number
                  | object
                  | objectkey
+                 | objectbrackets
         '''
         if DEBUG:
             self.print_p(p)
@@ -315,11 +359,11 @@ class HclParser(object):
 
     def p_listitem_1(self, p):
         '''
-        listitem : objectkey LEFTBRACKET objectkey RIGHTBRACKET
+        listitem : IDENTIFIER ASTERISK_PERIOD IDENTIFIER
         '''
         if DEBUG:
             self.print_p(p)
-        p[0] = (p[1] + p[2] + p[3] + p[4])
+        p[0] = p[1] + p[2] + p[3]
 
     def p_number_0(self, p):
         "number : int"
