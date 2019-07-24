@@ -188,6 +188,7 @@ class HclParser(object):
                    | objectkey EQUAL list
                    | objectkey EQUAL objectbrackets
                    | objectkey EQUAL function
+                   | objectkey EQUAL booleanexp
                    | objectkey COLON number
                    | objectkey COLON BOOL
                    | objectkey COLON STRING
@@ -195,6 +196,7 @@ class HclParser(object):
                    | objectkey COLON object
                    | objectkey COLON list
                    | objectkey COLON objectbrackets
+                   | objectkey COLON booleanexp
         '''
         if DEBUG:
             self.print_p(p)
@@ -292,7 +294,7 @@ class HclParser(object):
         '''
         if DEBUG:
             self.print_p(p)
-        p[0] = p[1] + p[2] + p[3] + p[4] + p[5] + p[6] + p[7] + p[8]
+        p[0] = [p[3]] + [p[5] + p[6] + p[7]]
 
     def p_function_0(self, p):
         '''
