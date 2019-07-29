@@ -36,7 +36,10 @@ class Lexer(object):
         'IDENTIFIER',
         'EQUAL',
         'STRING',
+        'ADD',
         'MINUS',
+        'MULTIPLY',
+        'DIVIDE',
         'LEFTBRACE',
         'RIGHTBRACE',
         'LEFTBRACKET',
@@ -306,9 +309,6 @@ class Lexer(object):
     t_tabbedheredoc_ignoring = t_heredoc_ignoring
     t_tabbedheredoc_eof = t_heredoc_eof
 
-    t_EQUAL = r'(?<!=)=(?!=)'
-    t_MINUS = r'-'
-
     t_LEFTBRACE = r'\{'
     t_RIGHTBRACE = r'\}'
     t_LEFTBRACKET = r'\['
@@ -331,7 +331,13 @@ class Lexer(object):
         t.lexer.lineno += len(t.value)
 
     t_ignore = ' \t\r\f\v'
-
+    
+    t_EQUAL = r'(?<!=)=(?!=)'
+    t_ADD = r'\+'
+    t_MINUS = r'-'
+    t_MULTIPLY = r'\*'
+    t_DIVIDE = r'/'
+    
     # Error handling rule
     def t_error(self, t):
         if t.value.startswith('/*'):
