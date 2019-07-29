@@ -49,7 +49,10 @@ class HclParser(object):
         'IDENTIFIER',
         'EQUAL',
         'STRING',
+        'ADD',
         'MINUS',
+        'MULTIPLY',
+        'DIVIDE',
         'LEFTBRACE',
         'RIGHTBRACE',
         'LEFTBRACKET',
@@ -163,6 +166,21 @@ class HclParser(object):
             self.print_p(p)
         p[0] = p[1]
 
+    def p_objectkey_1(self, p):
+        '''
+        objectkey : IDENTIFIER ADD number
+                  | number ADD IDENTIFIER
+                  | IDENTIFIER MINUS number
+                  | number MINUS IDENTIFIER
+                  | IDENTIFIER MULTIPLY number
+                  | number MULTIPLY IDENTIFIER
+                  | IDENTIFIER DIVIDE number
+                  | number DIVIDE IDENTIFIER
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = (str(p[1]), str(p[2]), str(p[3]))
+
     def p_objectbrackets_0(self, p):
         "objectbrackets : IDENTIFIER LEFTBRACKET objectkey RIGHTBRACKET"
         if DEBUG:
@@ -185,6 +203,7 @@ class HclParser(object):
                    | objectkey EQUAL STRING
                    | objectkey EQUAL IDENTIFIER
                    | objectkey EQUAL object
+                   | objectkey EQUAL objectkey
                    | objectkey EQUAL list
                    | objectkey EQUAL objectbrackets
                    | objectkey EQUAL function
@@ -194,6 +213,7 @@ class HclParser(object):
                    | objectkey COLON STRING
                    | objectkey COLON IDENTIFIER
                    | objectkey COLON object
+                   | objectkey COLON objectkey
                    | objectkey COLON list
                    | objectkey COLON objectbrackets
                    | objectkey COLON booleanexp
@@ -390,6 +410,38 @@ class HclParser(object):
         if DEBUG:
             self.print_p(p)
         p[0] = float("{0}{1}".format(p[1], p[2]))
+
+    def p_number_4(self, p):
+        '''
+        number : number ADD number
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] + p[3]
+
+    def p_number_5(self, p):
+        '''
+        number : number MINUS number
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] - p[3]
+
+    def p_number_6(self, p):
+        '''
+        number : number MULTIPLY number
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] * p[3]
+
+    def p_number_7(self, p):
+        '''
+        number : number DIVIDE number
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1] / p[3]
 
     def p_int_0(self, p):
         "int : MINUS int"
