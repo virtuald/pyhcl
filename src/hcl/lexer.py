@@ -331,13 +331,13 @@ class Lexer(object):
         t.lexer.lineno += len(t.value)
 
     t_ignore = ' \t\r\f\v'
-    
+
     t_EQUAL = r'(?<!=)=(?!=)'
     t_ADD = r'\+'
     t_MINUS = r'-'
     t_MULTIPLY = r'\*'
     t_DIVIDE = r'/'
-    
+
     # Error handling rule
     def t_error(self, t):
         if t.value.startswith('/*'):
