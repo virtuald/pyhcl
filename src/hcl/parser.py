@@ -233,20 +233,28 @@ class HclParser(object):
         objectitem : objectkey EQUAL objectkey QMARK objectkey COLON objectkey
                    | objectkey EQUAL objectkey QMARK objectkey COLON number
                    | objectkey EQUAL objectkey QMARK objectkey COLON BOOL
-                   | objectkey EQUAL objectkey QMARK BOOL COLON objectkey
+                   | objectkey EQUAL objectkey QMARK objectkey COLON function
                    | objectkey EQUAL objectkey QMARK number COLON objectkey
+                   | objectkey EQUAL objectkey QMARK BOOL COLON objectkey
+                   | objectkey EQUAL objectkey QMARK function COLON objectkey
                    | objectkey EQUAL objectkey QMARK number COLON number
                    | objectkey EQUAL objectkey QMARK number COLON BOOL
+                   | objectkey EQUAL objectkey QMARK number COLON function
                    | objectkey EQUAL objectkey QMARK BOOL COLON number
+                   | objectkey EQUAL objectkey QMARK BOOL COLON function
                    | objectkey EQUAL objectkey QMARK BOOL COLON BOOL
                    | objectkey EQUAL booleanexp QMARK objectkey COLON objectkey
                    | objectkey EQUAL booleanexp QMARK objectkey COLON number
                    | objectkey EQUAL booleanexp QMARK objectkey COLON BOOL
-                   | objectkey EQUAL booleanexp QMARK BOOL COLON objectkey
+                   | objectkey EQUAL booleanexp QMARK objectkey COLON function
                    | objectkey EQUAL booleanexp QMARK number COLON objectkey
+                   | objectkey EQUAL booleanexp QMARK BOOL COLON objectkey
+                   | objectkey EQUAL booleanexp QMARK function COLON objectkey
                    | objectkey EQUAL booleanexp QMARK number COLON number
                    | objectkey EQUAL booleanexp QMARK number COLON BOOL
+                   | objectkey EQUAL booleanexp QMARK number COLON function
                    | objectkey EQUAL booleanexp QMARK BOOL COLON number
+                   | objectkey EQUAL booleanexp QMARK BOOL COLON function
                    | objectkey EQUAL booleanexp QMARK BOOL COLON BOOL
         '''
         if DEBUG:
