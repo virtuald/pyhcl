@@ -330,7 +330,7 @@ class HclParser(object):
             self.print_p(p)
 
         p[0] = p[1] + p[2] + self.flatten(p[3]) + p[4]
-        
+
     def p_function_1(self, p):
         '''
         function : IDENTIFIER LEFTPAREN listitems COMMA RIGHTPAREN
