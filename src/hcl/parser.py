@@ -300,8 +300,6 @@ class HclParser(object):
         '''
         list : LEFTBRACKET listitems RIGHTBRACKET
              | LEFTBRACKET listitems COMMA RIGHTBRACKET
-             | LEFTPAREN listitems RIGHTPAREN
-             | LEFTPAREN listitems COMMA RIGHTPAREN
         '''
         if DEBUG:
             self.print_p(p)
@@ -326,12 +324,53 @@ class HclParser(object):
 
     def p_function_0(self, p):
         '''
-        function : IDENTIFIER list
+        function : IDENTIFIER LEFTPAREN listitems RIGHTPAREN
         '''
         if DEBUG:
             self.print_p(p)
-        p[2].insert(0, p[1])
-        p[0] = p[2]
+
+        p[0] = p[1] + p[2] + self.flatten(p[3]) + p[4]
+        
+    def p_function_1(self, p):
+        '''
+        function : IDENTIFIER LEFTPAREN listitems COMMA RIGHTPAREN
+        '''
+        if DEBUG:
+            self.print_p(p)
+
+        p[0] = p[1] + p[2] + self.flatten(p[3]) + p[5]
+
+    def flatten(self, value):
+        returnValue = ""
+        if type(value) is dict:
+            returnValue += "{"
+            isFirstTime = True
+            for key in value:
+                if isFirstTime:
+                    isFirstTime = False
+                else:
+                    returnValue += ","
+                returnValue += key + ":" + self.flatten(value[key])
+            returnValue += "}"
+        elif type(value) is list:
+            isFirstTime = True
+            for v in value:
+                if isFirstTime:
+                    isFirstTime = False
+                else:
+                    returnValue += ","
+                returnValue += self.flatten(v)
+        elif type(value) is tuple:
+            isFirstTime = True
+            for v in value:
+                if isFirstTime:
+                    isFirstTime = False
+                else:
+                    returnValue += ","
+                returnValue += self.flatten(v)
+        else:
+            returnValue = value
+        return returnValue
 
     def p_listitems_0(self, p):
         '''
