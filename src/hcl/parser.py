@@ -330,7 +330,7 @@ class HclParser(object):
             self.print_p(p)
 
         p[0] = p[1] + p[2] + self.flatten(p[3]) + p[4]
-
+        
     def p_function_1(self, p):
         '''
         function : IDENTIFIER LEFTPAREN listitems COMMA RIGHTPAREN
@@ -343,31 +343,11 @@ class HclParser(object):
     def flatten(self, value):
         returnValue = ""
         if type(value) is dict:
-            returnValue += "{"
-            isFirstTime = True
-            for key in value:
-                if isFirstTime:
-                    isFirstTime = False
-                else:
-                    returnValue += ","
-                returnValue += key + ":" + self.flatten(value[key])
-            returnValue += "}"
+            returnValue = "{" + ",".join(key + ":" + self.flatten(value[key]) for key in value) + "}"
         elif type(value) is list:
-            isFirstTime = True
-            for v in value:
-                if isFirstTime:
-                    isFirstTime = False
-                else:
-                    returnValue += ","
-                returnValue += self.flatten(v)
+            returnValue = ",".join(self.flatten(v) for v in value)
         elif type(value) is tuple:
-            isFirstTime = True
-            for v in value:
-                if isFirstTime:
-                    isFirstTime = False
-                else:
-                    returnValue += ","
-                returnValue += self.flatten(v)
+            returnValue = " ".join(self.flatten(v) for v in value)
         else:
             returnValue = value
         return returnValue
@@ -400,13 +380,20 @@ class HclParser(object):
                   | objectkey COMMA objectkey
                   | objectkey COMMA object
                   | objectkey COMMA list
-                  | objectkey COMMA IDENTIFIER ASTERISK_PERIOD IDENTIFIER
         '''
         if DEBUG:
             self.print_p(p)
         p[0] = [p[1], p[3]]
 
     def p_listitems_3(self, p):
+        '''
+        listitems : objectkey COMMA IDENTIFIER ASTERISK_PERIOD IDENTIFIER
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = [p[1], p[3] + p[4] + p[5]]
+
+    def p_listitems_4(self, p):
         '''
         listitems : objectkey list
         '''
