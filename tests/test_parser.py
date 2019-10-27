@@ -7,6 +7,7 @@ from __future__ import print_function
 from os.path import join, dirname
 import hcl
 import json
+from collections import OrderedDict
 
 import pytest
 
@@ -64,28 +65,43 @@ PARSE_FIXTURES = [
 
 @pytest.mark.parametrize("hcl_fname,invalid", PARSE_FIXTURES)
 def test_parser_bytes(hcl_fname, invalid):
-    
+
     with open(join(PARSE_FIXTURE_DIR, hcl_fname), 'rb') as fp:
-        
+
         input = fp.read()
         print(input)
-        
+
         if not invalid:
             hcl.loads(input)
         else:
             with pytest.raises(ValueError):
                 hcl.loads(input)
-                
+
 @pytest.mark.parametrize("hcl_fname,invalid", PARSE_FIXTURES)
 def test_parser_str(hcl_fname, invalid):
-    
+
     with open(join(PARSE_FIXTURE_DIR, hcl_fname), 'r') as fp:
-        
+
         input = fp.read()
         print(input)
-        
+
         if not invalid:
             hcl.loads(input)
+        else:
+            with pytest.raises(ValueError):
+                hcl.loads(input)
+
+@pytest.mark.parametrize("hcl_fname,invalid", PARSE_FIXTURES)
+def test_parser_object_pairs_hook(hcl_fname, invalid):
+    with open(join(PARSE_FIXTURE_DIR, hcl_fname), 'r') as fp:
+
+        input = fp.read()
+        print(input)
+
+        if not invalid:
+            output = hcl.loads(input, object_pairs_hook=OrderedDict)
+            dummy = OrderedDict([])
+            assert type(output) == type(dummy)
         else:
             with pytest.raises(ValueError):
                 hcl.loads(input)

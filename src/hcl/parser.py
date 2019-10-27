@@ -3,6 +3,7 @@ import sys
 
 from .lexer import Lexer
 from ply import lex, yacc
+from collections import OrderedDict
 
 import inspect
 
@@ -74,7 +75,11 @@ class HclParser(object):
                 
             from object.go: there's a flattened list structure
         '''
-        d = {}
+
+        if self.object_pairs_hook == OrderedDict:
+            d = OrderedDict()
+        else:
+            d = {}
 
         for k, v in lt:
             if k in d.keys() and not replace:
@@ -317,10 +322,11 @@ class HclParser(object):
 
         raise ValueError(msg)
 
-    def __init__(self):
+    def __init__(self, object_pairs_hook=None):
         self.yacc = yacc.yacc(
             module=self, debug=False, optimize=1, picklefile=pickle_file
         )
+        self.object_pairs_hook = object_pairs_hook
 
     def parse(self, s):
         return self.yacc.parse(s, lexer=Lexer())
