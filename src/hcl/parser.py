@@ -2,7 +2,7 @@ from os.path import abspath, dirname, exists, join
 import sys
 
 from .lexer import Lexer
-from ply import lex, yacc
+from .ply import yacc
 
 import inspect
 
