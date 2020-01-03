@@ -1,6 +1,7 @@
 import re
 import sys
-import ply.lex as lex
+
+from .ply import lex
 
 if sys.version_info < (3,):
     text_type = unicode
