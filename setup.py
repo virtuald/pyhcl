@@ -81,7 +81,7 @@ setup(
     url='https://github.com/virtuald/pyhcl',
     package_dir={'': 'src'},
     package_data={'hcl': ['src/hcl/parsetab.dat']},
-    packages=['hcl'],
+    packages=['hcl','hcl.ply'],
     scripts=["scripts/hcltool"],
     include_package_data=True,
     setup_requires=install_requires,
