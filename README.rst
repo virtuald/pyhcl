@@ -12,6 +12,11 @@ The grammar and many of the tests/fixtures were copied/ported from the
 golang parser into pyhcl. All releases are tested with a variety of 
 python versions from Python 2.7 onward.
 
+This version has been modified to work with terraform 0.12 syntax.  
+It should be backward compatible with earlier versions.  
+It doesn't cover every situation.  See discussion in pull request:
+https://github.com/virtuald/pyhcl/pull/57
+
 Installation
 ============
 
