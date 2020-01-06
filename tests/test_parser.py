@@ -25,6 +25,10 @@ PARSE_FIXTURES = [
         False,
     ),
     (
+        "list_of_lists.hcl",
+        False,
+    ),
+    (
         "list_of_maps.hcl",
         False,
     ),
