@@ -23,7 +23,6 @@ FIXTURES = [
     ('flat.hcl', None, {'foo': 'bar', 'Key': 7}),
     ('float.hcl', None, {'a': 1.02}),
     ('float.hcl', 'float.json', None),
-    ('function.hcl', 'function.json', None),
     ('multiline_bad.hcl', 'multiline.json', None),
     ('scientific.hcl', 'scientific.json', None),
     ('structure.hcl', 'structure_flat.json', None),
