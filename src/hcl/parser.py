@@ -79,13 +79,13 @@ class HclParser(object):
     def objectlist_flat(self, lt, replace):
         '''
             Similar to the dict constructor, but handles dups
-            
+
             HCL is unclear on what one should do when duplicate keys are
             encountered. These comments aren't clear either:
-            
+
             from decoder.go: if we're at the root or we're directly within
                              a list, decode into dicts, otherwise lists
-                
+
             from object.go: there's a flattened list structure
         '''
         d = {}
@@ -379,20 +379,29 @@ class HclParser(object):
         )
 
     def flatten(self, value):
-        returnValue = ""
-        if type(value) is dict:
-            returnValue = (
+        if isinstance(value, dict):
+            return (
                 "{"
                 + ",".join(key + ":" + self.flatten(value[key]) for key in value)
                 + "}"
             )
-        elif type(value) is list:
-            returnValue = ",".join(self.flatten(v) for v in value)
-        elif type(value) is tuple:
-            returnValue = " ".join(self.flatten(v) for v in value)
-        else:
-            returnValue = value
-        return returnValue
+        if isinstance(value, list):
+            return ",".join(self.flatten(v) for v in value)
+        if isinstance(value, tuple):
+            return " ".join(self.flatten(v) for v in value)
+        if isinstance(value, str):
+            if value.isnumeric():  # return numbers as is
+                return value
+            return (
+                '"' + value + '"'  # wrap string literals in double quotes
+                if value not in ['+', '-'] and '.' not in value
+                else value  # but not if its var interpolation or an operator
+            )
+        raise TypeError(
+            '%s is of type %s; expected type of dict, list, tuple, or str',
+            str(value),
+            type(value),
+        )
 
     def p_listitems_0(self, p):
         '''
