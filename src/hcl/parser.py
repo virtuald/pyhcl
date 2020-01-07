@@ -27,11 +27,15 @@ if sys.version_info[0] < 3:
     def iteritems(d):
         return iter(d.iteritems())
 
+    string_types = (str, unicode)
+
 
 else:
 
     def iteritems(d):
         return iter(d.items())
+
+    string_types = (str, bytes)
 
 
 class HclParser(object):
@@ -389,9 +393,13 @@ class HclParser(object):
             return ",".join(self.flatten(v) for v in value)
         if isinstance(value, tuple):
             return " ".join(self.flatten(v) for v in value)
-        if isinstance(value, str):
-            if value.isnumeric():  # return numbers as is
-                return value
+        if isinstance(value, string_types):
+            if sys.version_info[0] < 3:
+                if value.isdigit():  # python2 support, return numbers as is
+                    return value
+            else:
+                if value.isnumeric():  # return numbers as is
+                    return value
             return (
                 '"' + value + '"'  # wrap string literals in double quotes
                 if value not in ['+', '-'] and '.' not in value
