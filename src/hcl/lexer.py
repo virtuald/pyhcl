@@ -37,7 +37,10 @@ class Lexer(object):
         'IDENTIFIER',
         'EQUAL',
         'STRING',
+        'ADD',
         'MINUS',
+        'MULTIPLY',
+        'DIVIDE',
         'LEFTBRACE',
         'RIGHTBRACE',
         'LEFTBRACKET',
@@ -45,6 +48,17 @@ class Lexer(object):
         'PERIOD',
         'EPLUS',
         'EMINUS',
+        'LEFTPAREN',
+        'RIGHTPAREN',
+        'QMARK',
+        'COLON',
+        'ASTERISK_PERIOD',
+        'GT',
+        'LT',
+        'EQ',
+        'NE',
+        'LE',
+        'GE',
     )
 
     states = (
@@ -64,7 +78,7 @@ class Lexer(object):
         return t
 
     def t_EPLUS(self, t):
-        r'(?<=\d|\.)[eE]\+?'
+        r'(?<=\d)[eE]\+?|(?<=\d\.)[eE]\+?'
         return t
 
     def t_FLOAT(self, t):
@@ -90,6 +104,42 @@ class Lexer(object):
 
     def t_COMMA(self, t):
         r','
+        return t
+
+    def t_QMARK(self, t):
+        r'\?'
+        return t
+
+    def t_COLON(self, t):
+        r':'
+        return t
+
+    def t_ASTERISK_PERIOD(self, t):
+        r'\*\.'
+        return t
+
+    def t_GT(self, t):
+        r'(?<!>)>(?!>|=)'
+        return t
+
+    def t_LT(self, t):
+        r'(?<!<)<(?!<|=)'
+        return t
+
+    def t_EQ(self, t):
+        r'=='
+        return t
+
+    def t_NE(self, t):
+        r'!='
+        return t
+
+    def t_LE(self, t):
+        r'<='
+        return t
+
+    def t_GE(self, t):
+        r'>='
         return t
 
     def t_IDENTIFIER(self, t):
@@ -260,13 +310,12 @@ class Lexer(object):
     t_tabbedheredoc_ignoring = t_heredoc_ignoring
     t_tabbedheredoc_eof = t_heredoc_eof
 
-    t_EQUAL = r'='
-    t_MINUS = r'-'
-
     t_LEFTBRACE = r'\{'
     t_RIGHTBRACE = r'\}'
     t_LEFTBRACKET = r'\['
     t_RIGHTBRACKET = r'\]'
+    t_LEFTPAREN = r'\('
+    t_RIGHTPAREN = r'\)'
 
     def t_COMMENT(self, t):
         r'(\#|(//)).*'
@@ -283,6 +332,12 @@ class Lexer(object):
         t.lexer.lineno += len(t.value)
 
     t_ignore = ' \t\r\f\v'
+
+    t_EQUAL = r'(?<!=)=(?!=)'
+    t_ADD = r'\+'
+    t_MINUS = r'-'
+    t_MULTIPLY = r'\*'
+    t_DIVIDE = r'/'
 
     # Error handling rule
     def t_error(self, t):

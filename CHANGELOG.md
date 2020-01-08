@@ -1,3 +1,7 @@
+0.3.13 (2019-06-25)
+------------------
+* Updated for terraform v0.12 syntax
+
 0.2.1 (2016-04-14)
 ------------------
 * Fixes for mutliple configuration blocks with same name

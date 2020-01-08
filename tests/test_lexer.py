@@ -98,6 +98,18 @@ LEX_FIXTURES = [
             "IDENTIFIER", "EQUAL", "STRING", None,
         ],
     ),
+    (
+        "unterminated_block_comment.hcl",
+        ["DIVIDE", "MULTIPLY", "IDENTIFIER"],
+    ),
+    (
+        "nested_comment.hcl",
+        ["MULTIPLY", "DIVIDE", None],
+    ),
+    (
+        "/not a comment",
+        ["DIVIDE", "IDENTIFIER", "IDENTIFIER", "IDENTIFIER", None],
+    ),
 ]
 
 # The first value in the tuple can be either the file that will be read or just
@@ -106,30 +118,15 @@ LEX_ERROR_FIXTURES = [
     (
         "old.hcl",
         [
-            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", Error
+            "IDENTIFIER", "EQUAL", "LEFTBRACE", "STRING", "COLON", "STRING"
         ],
         "Line 2, column 15, index 27: Illegal character ':'"
-    ),
-    (
-        "unterminated_block_comment.hcl",
-        [Error],
-        "Line 1, column 0, index 0: EOF before closing multiline comment"
-    ),
-    (
-        "nested_comment.hcl",
-        [Error],
-        "Line 5, column 0, index 13: Found '*/' before start of multiline comment"
-    ),
-    (
-        "/not a comment",
-        [Error],
-        "Line 1, column 0, index 0: Expected '//' for comment, got '/n'"
     ),
     (
         "a = <HERE\n"
         "foobar\n"
         "HERE",
-        ["IDENTIFIER", "EQUAL", Error],
+        ["IDENTIFIER", "EQUAL", "LT", "IDENTIFIER"],
         "Line 1, column 4, index 4: Heredoc must start with '<<', got '<H'"
     ),
     (
@@ -161,21 +158,24 @@ LEX_ERROR_FIXTURES = [
 @pytest.mark.parametrize("hcl_fname,tokens", LEX_FIXTURES)
 def test_lexer(hcl_fname, tokens):
 
-    with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
-        input = fp.read()
+    if hcl_fname.endswith('.hcl'):
+        with open(join(LEX_FIXTURE_DIR, hcl_fname), 'r') as fp:
+            input = fp.read()
+    else:
+        input = hcl_fname
 
     print(input)
 
     lexer = hcl.lexer.Lexer()
     lexer.input(input)
 
-    for tok in tokens:
+    for expectedToken in tokens:
         lex_tok = lexer.token()
 
         if lex_tok is None:
-            assert tok is None
+            assert expectedToken is None
         else:
-            assert tok == lex_tok.type
+            assert expectedToken == lex_tok.type
         print(lex_tok)
 
     assert lexer.token() is None
@@ -194,18 +194,18 @@ def test_lexer_errors(hcl_fname, tokens, error_loc):
     lexer = hcl.lexer.Lexer()
     lexer.input(input)
 
-    for tok in tokens:
+    for expectedToken in tokens:
         try:
             lex_tok = lexer.token()
         except ValueError as e:
-            assert tok is Error
+            assert expectedToken is Error
             assert error_loc == str(e)
             return
 
         if lex_tok is None:
-            assert tok is None
+            assert expectedToken is None
         else:
-            assert tok == lex_tok.type
+            assert expectedToken == lex_tok.type
         print(lex_tok)
 
 f100 = 'f' * 100
@@ -233,14 +233,28 @@ TOKEN_FIXTURES = [
     (None, "/*" + f100 + "*/"),
 
     # Operators
+    ("LEFTPAREN", "("),
     ("LEFTBRACKET", "["),
     ("LEFTBRACE", "{"),
     ("COMMA", ","),
     ("PERIOD", "."),
+    ("RIGHTPAREN", ")"),
     ("RIGHTBRACKET", "]"),
     ("RIGHTBRACE", "}"),
     ("EQUAL", "="),
+    ("ADD", "+"),
     ("MINUS", "-"),
+    ("MULTIPLY", "*"),
+    ("DIVIDE", "/"),
+    ("QMARK", "?"),
+    ("COLON", ":"),
+    ("GT", ">"),
+    ("LT", "<"),
+    ("EQ", "=="),
+    ("NE", "!="),
+    ("LE", "<="),
+    ("GE", ">="),
+    ("ASTERISK_PERIOD", "*."),
 
     # Bools
     ("BOOL", "true"),
@@ -382,6 +396,7 @@ def test_tokens(token, input_string):
 # other token
 COMPLEX_TOKEN_FIXTURES = [
     # EPLUS
+    (["IDENTIFIER", "EQUAL", "LEFTBRACKET", "IDENTIFIER", "LEFTBRACKET", "NUMBER", "RIGHTBRACKET", "PERIOD", "IDENTIFIER", "RIGHTBRACKET", ], "records = [aws_elasticsearch_domain.elasticsearch[0].endpoint]"),
     (["FLOAT", "EPLUS"], "0.e"),
     (["FLOAT", "EPLUS"], "1.e+"),
     (["NUMBER", "EPLUS"], "0e"),
