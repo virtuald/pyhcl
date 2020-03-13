@@ -34,6 +34,8 @@ class Lexer(object):
         'FLOAT',
         'NUMBER',
         'COMMA',
+        'COMMENT',
+        'MULTICOMMENT',
         'IDENTIFIER',
         'EQUAL',
         'STRING',
@@ -67,6 +69,8 @@ class Lexer(object):
         ('heredoc', 'exclusive'),
         ('tabbedheredoc', 'exclusive'),
     )
+
+    can_export_comments = []
 
     def t_BOOL(self, t):
         r'(true)|(false)'
@@ -319,12 +323,15 @@ class Lexer(object):
 
     def t_COMMENT(self, t):
         r'(\#|(//)).*'
-        pass
+        if 'COMMENT' in self.can_export_comments:
+            t.value = t.value.lstrip('#').lstrip('//').lstrip()
+            return t
 
     def t_MULTICOMMENT(self, t):
         r'/\*(.|\n)*?(\*/)'
         t.lexer.lineno += t.value.count('\n')
-        pass
+        if 'MULTICOMMENT' in self.can_export_comments:
+            return t
 
     # Define a rule so we can track line numbers
     def t_newline(self, t):
@@ -356,7 +363,20 @@ class Lexer(object):
         else:
             _raise_error(t)
 
-    def __init__(self):
+    def __init__(self, export_comments=None):
+        if export_comments is not None:
+            if export_comments == 'LINE':
+                self.can_export_comments = ['COMMENT']
+            elif export_comments == 'MULTILINE':
+                self.can_export_comments = ['MULTICOMMENT']
+            elif export_comments == 'ALL':
+                self.can_export_comments = ['COMMENT', 'MULTICOMMENT']
+            else:
+                raise ValueError(
+                    'Only `LINE`, `MULTILINE` and `ALL` value are allowed for '
+                    '`export_comments`. given: `%s`.' % export_comments
+                )
+
         self.lex = lex.lex(
             module=self,
             debug=False,
