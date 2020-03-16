@@ -463,6 +463,16 @@ class HclParser(object):
         p[2].insert(0, p[1])
         p[0] = p[2]
 
+    def p_listitems_5(self, p):
+        '''
+        listitems : listitems COMMA COMMENT
+                  | listitems COMMA MULTICOMMENT
+        '''
+        # skip comments in lists
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1]
+
     def p_listitem_0(self, p):
         '''
         listitem : number
