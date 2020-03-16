@@ -391,21 +391,9 @@ def test_tokens(token, input_string):
         assert token == lex_tok.type
         assert lexer.token() is None
 
-@pytest.mark.parametrize("token,input_string", TOKEN_FIXTURES)
-def test_tokens_with_export_comments_wrong_parameter(token, input_string):
-
-    print(input_string)
-
-    lexer = hcl.lexer.Lexer(export_comments="WRONG")
-    lexer.input(input_string)
-
-    lex_tok = lexer.token()
-
-    if lex_tok is None:
-        assert token is None
-    else:
-        assert token == lex_tok.type
-        assert lexer.token() is None
+def test_export_comments_wrong_parameter():
+    with pytest.raises(ValueError):
+        lexer = hcl.lexer.Lexer(export_comments="WRONG")
 
 ONE_LINE_COMMENT_FIXTURES = [
     ("COMMENT", "//"),

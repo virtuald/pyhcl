@@ -60,3 +60,28 @@ def test_decoder(hcl_fname, json_fname, struct):
 
     if struct is not None:
         assert hcl_json == struct
+
+
+COMMENTED_FIXTURES = [
+    ('single_line_comment.hcl', 'single_line_comment_L.json', "single_line_comment.json", 'single_line_comment_L.json'),
+    ('multi_line_comment.hcl', 'multi_line_comment.json', 'multi_line_comment_M.json', 'multi_line_comment_M.json'),
+    ('structure_comment.hcl', 'structure_comment_L.json', 'structure_comment_M.json', 'structure_comment_A.json'),
+    ('array_comment.hcl', 'array_comment.json', 'array_comment.json', 'array_comment.json')
+]
+
+@pytest.mark.parametrize("export_comments", ['LINE', 'MULTILINE', 'ALL'])
+@pytest.mark.parametrize("hcl_fname,sline_fname,mline_fname,aline_fname", COMMENTED_FIXTURES)
+def test_decoder_export_comments(hcl_fname, sline_fname, mline_fname, aline_fname, export_comments):
+    with open(join(FIXTURE_DIR, hcl_fname), 'r') as fp:
+        hcl_json = hcl.load(fp, export_comments)
+
+    json_fname = {
+        "LINE": sline_fname,
+        "MULTILINE": mline_fname,
+        "ALL": aline_fname
+    }
+
+    with open(join(FIXTURE_DIR, json_fname[export_comments]), 'r') as fp:
+            good_json = json.load(fp)
+
+    assert hcl_json == good_json

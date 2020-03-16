@@ -1,0 +1,5 @@
+{
+    "comment-L001": "test single line comment with slash",
+    "comment-L002": "test single line comment with hashtag",
+    "foo": "bar"
+}

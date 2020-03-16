@@ -1,0 +1,7 @@
+{
+    "foo": {
+        "comment-L002": "single line comment",
+        "comment-L003": "/*\n        multi line comment\n    */",
+        "foo": "bar"
+    }
+}

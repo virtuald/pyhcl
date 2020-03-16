@@ -1,0 +1,6 @@
+{
+    "foo": {
+        "comment-L002": "single line comment",
+        "foo": "bar"
+    }
+}
