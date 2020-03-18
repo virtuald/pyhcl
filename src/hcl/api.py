@@ -42,28 +42,40 @@ def isHcl(s):
     raise ValueError("No HCL object could be decoded")
 
 
-def load(fp):
+def load(fp, export_comments=None):
     '''
         Deserializes a file-pointer like object into a python dictionary.
         The contents of the file must either be JSON or HCL.
         
         :param fp: An object that has a read() function
+        :param export_comments: optional string that allow to export also coded comments. it could be:
+            'LINE': to export only single-line comments (// or #)
+            'MULTILINE': to export only multi-line comments (/* ... */)
+            'ALL': to export both 'LINE' and 'MULTILINE' comments
+            default None
         
         :returns: Dictionary
     '''
-    return loads(fp.read())
+    return loads(fp.read(), export_comments=export_comments)
 
 
-def loads(s):
+def loads(s, export_comments=None):
     '''
         Deserializes a string and converts it to a dictionary. The contents
         of the string must either be JSON or HCL.
+        
+        :param s: string to parse
+        :param export_comments: optional string that allow to export also coded comments. it could be:
+            'LINE': to export only single-line comments (// or #)
+            'MULTILINE': to export only multi-line comments (/* ... */)
+            'ALL': to export both 'LINE' and 'MULTILINE' comments
+            default None
         
         :returns: Dictionary 
     '''
     s = u(s)
     if isHcl(s):
-        return HclParser().parse(s)
+        return HclParser().parse(s, export_comments=export_comments)
     else:
         return json.loads(s)
 

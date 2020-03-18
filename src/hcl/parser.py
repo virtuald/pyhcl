@@ -50,6 +50,8 @@ class HclParser(object):
         'NUMBER',
         'COMMA',
         'COMMAEND',
+        'COMMENT',
+        'MULTICOMMENT',
         'IDENTIFIER',
         'EQUAL',
         'STRING',
@@ -461,6 +463,16 @@ class HclParser(object):
         p[2].insert(0, p[1])
         p[0] = p[2]
 
+    def p_listitems_5(self, p):
+        '''
+        listitems : listitems COMMA COMMENT
+                  | listitems COMMA MULTICOMMENT
+        '''
+        # skip comments in lists
+        if DEBUG:
+            self.print_p(p)
+        p[0] = p[1]
+
     def p_listitem_0(self, p):
         '''
         listitem : number
@@ -568,6 +580,15 @@ class HclParser(object):
             self.print_p(p)
         p[0] = "e-{0}".format(p[2])
 
+    def p_comment_0(self, p):
+        '''
+        block : COMMENT
+              | MULTICOMMENT
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = ("comment-L{:03d}".format(p.lineno(1)), p[1])
+
     # useful for debugging the parser
     def print_p(self, p):
         if DEBUG:
@@ -606,5 +627,7 @@ class HclParser(object):
             module=self, debug=False, optimize=1, picklefile=pickle_file
         )
 
-    def parse(self, s):
-        return self.yacc.parse(s, lexer=Lexer())
+    def parse(self, s, export_comments=None):
+        return self.yacc.parse(
+            s, lexer=Lexer(export_comments=export_comments), debug=True
+        )

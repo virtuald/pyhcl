@@ -391,6 +391,124 @@ def test_tokens(token, input_string):
         assert token == lex_tok.type
         assert lexer.token() is None
 
+def test_export_comments_wrong_parameter():
+    with pytest.raises(ValueError):
+        lexer = hcl.lexer.Lexer(export_comments="WRONG")
+
+ONE_LINE_COMMENT_FIXTURES = [
+    ("COMMENT", "//"),
+    ("COMMENT", "////"),
+    ("COMMENT", "// comment"),
+    ("COMMENT", "// /* comment */"),
+    ("COMMENT", "// // comment //"),
+    ("COMMENT", "//" + f100),
+    ("COMMENT", "#"),
+    ("COMMENT", "##"),
+    ("COMMENT", "# comment"),
+    ("COMMENT", "# /* comment */"),
+    ("COMMENT", "# # comment #"),
+    ("COMMENT", "#" + f100),
+    (None, "/**/"),
+    (None, "/***/"),
+    (None, "/* comment */"),
+    (None, "/* // comment */"),
+    (None, "/* /* comment */"),
+    (None, "/*\n comment\n*/"),
+    (None, "/*" + f100 + "*/")
+]
+
+@pytest.mark.parametrize("token,input_string", ONE_LINE_COMMENT_FIXTURES)
+def test_one_line_comments_extract(token, input_string):
+
+    print(input_string)
+
+    lexer = hcl.lexer.Lexer(export_comments='LINE')
+    lexer.input(input_string)
+
+    lex_tok = lexer.token()
+
+    if lex_tok is None:
+        assert token is None
+    else:
+        assert token == lex_tok.type
+        assert lexer.token() is None
+
+MULTI_LINE_COMMENT_FIXTURES = [
+    (None, "//"),
+    (None, "////"),
+    (None, "// comment"),
+    (None, "// /* comment */"),
+    (None, "// // comment //"),
+    (None, "//" + f100),
+    (None, "#"),
+    (None, "##"),
+    (None, "# comment"),
+    (None, "# /* comment */"),
+    (None, "# # comment #"),
+    (None, "#" + f100),
+    ("MULTICOMMENT", "/**/"),
+    ("MULTICOMMENT", "/***/"),
+    ("MULTICOMMENT", "/* comment */"),
+    ("MULTICOMMENT", "/* // comment */"),
+    ("MULTICOMMENT", "/* /* comment */"),
+    ("MULTICOMMENT", "/*\n comment\n*/"),
+    ("MULTICOMMENT", "/*" + f100 + "*/")
+]
+
+@pytest.mark.parametrize("token,input_string", MULTI_LINE_COMMENT_FIXTURES)
+def test_multi_line_comments_extract(token, input_string):
+
+    print(input_string)
+
+    lexer = hcl.lexer.Lexer(export_comments='MULTILINE')
+    lexer.input(input_string)
+
+    lex_tok = lexer.token()
+
+    if lex_tok is None:
+        assert token is None
+    else:
+        assert token == lex_tok.type
+        assert lexer.token() is None
+
+COMMENT_FIXTURES = [
+    ("COMMENT", "//"),
+    ("COMMENT", "////"),
+    ("COMMENT", "// comment"),
+    ("COMMENT", "// /* comment */"),
+    ("COMMENT", "// // comment //"),
+    ("COMMENT", "//" + f100),
+    ("COMMENT", "#"),
+    ("COMMENT", "##"),
+    ("COMMENT", "# comment"),
+    ("COMMENT", "# /* comment */"),
+    ("COMMENT", "# # comment #"),
+    ("COMMENT", "#" + f100),
+    ("MULTICOMMENT", "/**/"),
+    ("MULTICOMMENT", "/***/"),
+    ("MULTICOMMENT", "/* comment */"),
+    ("MULTICOMMENT", "/* // comment */"),
+    ("MULTICOMMENT", "/* /* comment */"),
+    ("MULTICOMMENT", "/*\n comment\n*/"),
+    ("MULTICOMMENT", "/*" + f100 + "*/")
+]
+
+@pytest.mark.parametrize("token,input_string", COMMENT_FIXTURES)
+def test_multi_line_comments_extract(token, input_string):
+
+    print(input_string)
+
+    lexer = hcl.lexer.Lexer(export_comments='ALL')
+    lexer.input(input_string)
+
+    lex_tok = lexer.token()
+
+    if lex_tok is None:
+        assert token is None
+    else:
+        assert token == lex_tok.type
+        assert lexer.token() is None
+
 # Testing EPLUS and EMINUS can't be done on their own since they
 # require positive lookbehinds and therefore the lexer will find at least one
 # other token
