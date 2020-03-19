@@ -96,6 +96,14 @@ To run the tests::
 
     pip install -r testing-requirements.txt
     tests/run_tests.sh
+    
+Debug Mode
+----------
+
+To enable debug mode:
+
+    import hcl
+    hcl.parser.DEBUG = True
 
 Authors
 =======
