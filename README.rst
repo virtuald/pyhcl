@@ -100,7 +100,7 @@ To run the tests::
 Debug Mode
 ----------
 
-To enable debug mode:
+To enable debug mode::
 
     import hcl
     hcl.parser.DEBUG = True
