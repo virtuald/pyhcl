@@ -629,5 +629,5 @@ class HclParser(object):
 
     def parse(self, s, export_comments=None):
         return self.yacc.parse(
-            s, lexer=Lexer(export_comments=export_comments), debug=True
+            s, lexer=Lexer(export_comments=export_comments), debug=DEBUG
         )
