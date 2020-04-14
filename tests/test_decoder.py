@@ -25,6 +25,7 @@ FIXTURES = [
     ('float.hcl', None, {'a': 1.02}),
     ('float.hcl', 'float.json', None),
     ('function.hcl', 'function.json', None),
+    ('issue12.hcl', 'issue12.json', None),
     ('multiline_bad.hcl', 'multiline.json', None),
     ('nested_lists.hcl', 'nested_lists.json', None),
     ('only_comments.hcl', None, {}),
