@@ -2268,7 +2268,7 @@ class ParserReflect(object):
 # Build a parser
 # -----------------------------------------------------------------------------
 
-def yacc(*, debug=yaccdebug, module=None, start=None,
+def yacc(debug=yaccdebug, module=None, start=None,
          check_recursion=True, optimize=False, debugfile=debug_file,
          debuglog=None, errorlog=None):
 
