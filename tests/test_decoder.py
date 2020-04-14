@@ -25,6 +25,7 @@ FIXTURES = [
     ('float.hcl', 'float.json', None),
     ('function.hcl', 'function.json', None),
     ('multiline_bad.hcl', 'multiline.json', None),
+    ('nested_lists.hcl', 'nested_lists.json', None),
     ('scientific.hcl', 'scientific.json', None),
     ('structure.hcl', 'structure_flat.json', None),
     #('structure2.hcl', 'structure2.json', None),  # not in the golang tests

@@ -419,6 +419,7 @@ class HclParser(object):
                   | function
                   | object COMMA
                   | objectkey COMMA
+                  | list COMMA
         '''
         if DEBUG:
             self.print_p(p)
@@ -624,7 +625,7 @@ class HclParser(object):
 
     def __init__(self):
         self.yacc = yacc.yacc(
-            module=self, debug=False, optimize=1, picklefile=pickle_file
+            module=self, debug=False, optimize=1, debugfile=pickle_file
         )
 
     def parse(self, s, export_comments=None):
