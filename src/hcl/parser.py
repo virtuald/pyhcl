@@ -122,10 +122,21 @@ class HclParser(object):
         return d
 
     def p_top(self, p):
-        "top : objectlist"
+        '''
+        top : empty
+            | objectlist
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = self.objectlist_flat(p[1], True)
+
+    def p_empty_0(self, p):
+        '''
+        empty :
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = []
 
     def p_objectlist_0(self, p):
         "objectlist : objectitem"
