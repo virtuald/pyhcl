@@ -122,10 +122,21 @@ class HclParser(object):
         return d
 
     def p_top(self, p):
-        "top : objectlist"
+        '''
+        top : empty
+            | objectlist
+        '''
         if DEBUG:
             self.print_p(p)
         p[0] = self.objectlist_flat(p[1], True)
+
+    def p_empty_0(self, p):
+        '''
+        empty :
+        '''
+        if DEBUG:
+            self.print_p(p)
+        p[0] = []
 
     def p_objectlist_0(self, p):
         "objectlist : objectitem"
@@ -419,6 +430,7 @@ class HclParser(object):
                   | function
                   | object COMMA
                   | objectkey COMMA
+                  | list COMMA
         '''
         if DEBUG:
             self.print_p(p)
@@ -624,7 +636,7 @@ class HclParser(object):
 
     def __init__(self):
         self.yacc = yacc.yacc(
-            module=self, debug=False, optimize=1, picklefile=pickle_file
+            module=self, debug=False, optimize=1, debugfile=pickle_file
         )
 
     def parse(self, s, export_comments=None):
