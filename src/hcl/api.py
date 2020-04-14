@@ -30,6 +30,9 @@ def isHcl(s):
         :returns: True if HCL, False if JSON, raises ValueError
                   if neither
     '''
+    if not s:
+        return True
+
     for c in s:
         if c.isspace():
             continue
