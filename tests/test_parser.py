@@ -99,3 +99,13 @@ def test_parser_str(hcl_fname, invalid, export_comments):
         else:
             with pytest.raises(ValueError):
                 hcl.loads(input, export_comments)
+
+
+def test_issue_52_missing_equal():
+    data = """
+a_block {
+    ok = "fine"
+    not_okay    "<-- no equal here"
+}"""
+    with pytest.raises(ValueError):
+        hcl.loads(data)
