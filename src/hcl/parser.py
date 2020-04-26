@@ -49,7 +49,6 @@ class HclParser(object):
         'FLOAT',
         'NUMBER',
         'COMMA',
-        'COMMAEND',
         'COMMENT',
         'MULTICOMMENT',
         'IDENTIFIER',
