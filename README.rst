@@ -8,6 +8,8 @@ Language) <https://github.com/hashicorp/hcl>`__ in Python. This
 implementation aims to be compatible with the original golang version of
 the parser.
 
+pyhcl does not support HCL2.
+
 The grammar and many of the tests/fixtures were copied/ported from the
 golang parser into pyhcl. All releases are tested with a variety of 
 python versions from Python 2.7 onward.
