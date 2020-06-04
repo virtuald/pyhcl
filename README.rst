@@ -8,7 +8,8 @@ Language) <https://github.com/hashicorp/hcl>`__ in Python. This
 implementation aims to be compatible with the original golang version of
 the parser.
 
-pyhcl does not support HCL2.
+pyhcl does not support HCL2 (which is what modern terraform uses). You might try
+https://pypi.org/project/python-hcl2/ instead (though I've never personally tried it).
 
 The grammar and many of the tests/fixtures were copied/ported from the
 golang parser into pyhcl. All releases are tested with a variety of 
