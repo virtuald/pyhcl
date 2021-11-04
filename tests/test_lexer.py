@@ -38,7 +38,7 @@ LEX_FIXTURES = [
         "list.hcl",
         [
             "IDENTIFIER", "EQUAL", "LEFTBRACKET",
-            "NUMBER", "COMMA", "NUMBER", "COMMA", "STRING",
+            "NUMBER",
             "RIGHTBRACKET", None,
         ],
     ),
