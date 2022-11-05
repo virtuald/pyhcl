@@ -3,12 +3,13 @@
 from __future__ import print_function
 
 from os.path import abspath, dirname, join, exists
-from distutils.core import setup
 
 try:
     from setuptools.command.build_py import build_py as _build_py
 except ImportError:
     from distutils.command.build_py import build_py as _build_py
+
+from distutils.core import setup
 
 import os
 import sys
