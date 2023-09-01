@@ -1,8 +1,6 @@
 pyhcl
 =====
 
-|Build Status|
-
 Implements a parser for `HCL (HashiCorp Configuration
 Language) <https://github.com/hashicorp/hcl>`__ in Python. This
 implementation aims to be compatible with the original golang version of
@@ -114,6 +112,3 @@ Authors
 Dustin Spicuzza (dustin@virtualroadside.com)
 
 Note: This project is not associated with Hashicorp
-
-.. |Build Status| image:: https://travis-ci.org/virtuald/pyhcl.svg?branch=master
-   :target: https://travis-ci.org/virtuald/pyhcl
