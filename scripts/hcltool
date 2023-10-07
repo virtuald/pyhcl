@@ -18,7 +18,17 @@ import sys
 import json
 import hcl
 
+HELP_DIALOG = """{filename} [infile [outfile]]
+
+If `infile` is not provided, `infile` defaults to `stdin`.
+If `outfile` is not provided, `outfile` defaults to `stdout`."""
+
 def main():
+    help_args = ['-h', '--help']
+    if any([x for x in sys.argv if x.lower() in help_args]):
+        print(HELP_DIALOG.format(filename=sys.argv[0]))
+        return
+
     if len(sys.argv) == 1:
         infile = sys.stdin
         outfile = sys.stdout
