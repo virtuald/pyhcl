@@ -22,19 +22,19 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
         fetch-depth: 0
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v6
       with:
         python-version: 3.8
 
     - run: pipx run build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: dist
         path: dist
@@ -59,17 +59,17 @@ jobs:
         architecture: [x64]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
         fetch-depth: 0
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python_version }}
         architecture: ${{ matrix.architecture }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v5
       with:
         name: dist
         path: dist
@@ -94,7 +94,7 @@ jobs:
     
     steps:
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v6
       with:
         name: dist
         path: dist
