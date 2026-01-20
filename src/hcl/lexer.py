@@ -9,6 +9,13 @@ else:
     text_type = str
 
 
+class _NullLogger(object):
+    def __getattribute__(self, name):
+        return self
+    def __call__(self, *args, **kwargs):
+        return self
+
+
 def _raise_error(t, message=None):
     lexpos = t.lexer.lexpos
     lexdata = t.lexer.lexdata
@@ -381,7 +388,7 @@ class Lexer(object):
             module=self,
             debug=False,
             reflags=(re.UNICODE | re.MULTILINE),
-            errorlog=lex.NullLogger(),
+            errorlog=_NullLogger(),
         )
 
     def input(self, s):
